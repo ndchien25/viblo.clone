@@ -7,11 +7,22 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import LoginPage from './pages/LoginPage';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPassord';
+
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/login",
     element: <LoginPage/>
+  },
+  {
+    path: "/register",
+    element: <RegisterPage/>
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage/>
   },
 ]);
 createRoot(document.getElementById('root')!).render(
