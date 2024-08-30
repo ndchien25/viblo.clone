@@ -67,3 +67,9 @@
     @apply bg-background text-foreground;
   }
 }
+*, :after, ::before {
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none;
+}

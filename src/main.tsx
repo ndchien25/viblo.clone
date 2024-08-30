@@ -10,20 +10,32 @@ import {
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPassord';
-
+import { Homepage } from './pages/Homepage';
+import Layout from './components/layouts/layouts';
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LoginPage/>
+    path: '/login',
+    element: <LoginPage />
   },
   {
-    path: "/register",
-    element: <RegisterPage/>
+    path: '/register',
+    element: <RegisterPage />
   },
   {
-    path: "/forgot-password",
-    element: <ForgotPasswordPage/>
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />
   },
+
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        path: "newest",
+        element: <Homepage />
+      }
+    ]
+  }
 ]);
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
