@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -14,27 +14,30 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
-import {
-  Check,
-  Loader2,
-} from "lucide-react"
-
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { cn } from "@/lib/utils"
+import { Check, Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
 import logo from "@/assets/img/logo_viblo.svg";
 import { useState } from "react";
-import ButtonFB from "@/components/social/ButtonFB"
-import ButtonGG from "@/components/social/ButtonGG"
-import ButtonGithub from "@/components/social/ButtonGithub"
-import { RegisterSchema } from "@/schemas/AuthSchema"
+import ButtonFB from "@/components/social/ButtonFB";
+import ButtonGG from "@/components/social/ButtonGG";
+import ButtonGithub from "@/components/social/ButtonGithub";
+import { RegisterSchema } from "@/schemas/AuthSchema";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { registerService } from "@/services/AuthService";
 
-type CardProps = React.ComponentProps<typeof Card>
+type CardProps = React.ComponentProps<typeof Card>;
+
 export default function RegisterPage({ className, ...props }: CardProps) {
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<Record<string, string>>({});
+  const [isRegistered, setIsRegistered] = useState(false); // Track registration status
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -44,13 +47,23 @@ export default function RegisterPage({ className, ...props }: CardProps) {
       username: "",
       email: "",
       password: "",
-      c_password: ""
+      c_password: "",
+      term: false,
     },
-  })
+  });
 
-  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
+  const { clearErrors } = form;
+
+  const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
     setLoading(true);
-    console.log(data);
+    const result = await registerService(data, (err: any) => {
+      setErrorMessage(err.data?.errors);
+      setLoading(false);
+    });
+    if (result) {
+      setIsRegistered(true); // Update state to show success message
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,43 +71,95 @@ export default function RegisterPage({ className, ...props }: CardProps) {
       <Card className={cn("w-4/12", className)} {...props}>
         <CardHeader>
           <div className="flex justify-center mb-7">
-            <img className="w-[120px]" src={logo} alt="Viblo logo" />
+            <img className="w-[100px]" src={logo} alt="Viblo logo" />
           </div>
-          <CardTitle className={cn("text-xl")}>Đăng ký tài khoản cho Viblo</CardTitle>
-          <CardDescription>Chào mừng bạn đến <span className="font-bold">Nền tảng Viblo!</span> Tham gia cùng chúng tôi để tìm kiếm thông tin hữu ích cần thiết để cải thiện kỹ năng IT của bạn. Vui lòng điền thông tin của bạn vào biểu mẫu bên dưới để tiếp tục.</CardDescription>
+          <CardTitle className={cn("text-xl")}>
+            Đăng ký tài khoản cho Viblo
+          </CardTitle>
+          <CardDescription>
+            Chào mừng bạn đến <span className="font-bold">Nền tảng Viblo!</span> Tham gia cùng chúng tôi để tìm kiếm thông tin hữu ích cần thiết để cải thiện kỹ năng IT của bạn. Vui lòng điền thông tin của bạn vào biểu mẫu bên dưới để tiếp tục.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="display_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="text"
-                          placeholder="Tên người dùng"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs text-red-500" />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex gap-4">
+          {!isRegistered ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
                   <FormField
                     control={form.control}
-                    name="username"
+                    name="display_name"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="text"
-                            placeholder="Tên tài khoản"
+                          <Input 
+                            {...field} 
+                            type="text" 
+                            placeholder="Tên người dùng" 
                           />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex gap-4">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="text"
+                              placeholder="Tên tài khoản"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                clearErrors("username");
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                          {errorMessage.username && (
+                            <span className="text-xs text-red-500">
+                              {errorMessage.username}
+                            </span>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="Địa chỉ email của bạn"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                clearErrors("email");
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                          {errorMessage.email && (
+                            <span className="text-xs text-red-500">
+                              {errorMessage.email}
+                            </span>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="Mật khẩu" />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
                       </FormItem>
@@ -102,74 +167,86 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                   />
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="c_password"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="Địa chỉ email của bạn"
-                          />
+                          <Input {...field} type="password" placeholder="Xác nhận mật khẩu của bạn" />
+                        </FormControl>
+                        <FormMessage className="text-xs text-red-500" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="term"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                            <Label className="ml-2">
+                              Tôi đồng ý{" "}
+                              <Link
+                                to="/terms"
+                                target="_blank"
+                                className="hover:underline text-cyan-600"
+                              >
+                                Điều khoảng dịch vụ của Viblo
+                              </Link>
+                            </Label>
+                          </div>
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
                       </FormItem>
                     )}
                   />
                 </div>
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} type="password" placeholder="Mật khẩu" />
-                      </FormControl>
-                      <FormMessage className="text-xs text-red-500" />
-                    </FormItem>
+                <Button type="submit" className="float-end" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Đăng ký
+                    </>
                   )}
-                />
-                <FormField
-                  control={form.control}
-                  name="c_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} type="password" placeholder="Xác nhận mật khẩu của bạn" />
-                      </FormControl>
-                      <FormMessage className="text-xs text-red-500" />
-                    </FormItem>
-                  )}
-                />
+                </Button>
+                <Button className={cn("bg-white mr-2 text-black border-2 hover:text-white")}><Link to="/login">Hủy bỏ</Link></Button>
+              </form>
+            </Form>
+          ) : (
+            <>
+              <div className="bg-green-200 p-4">
+                <p className="text-green-700">Chào mừng username, tài khoản của bạn đã được đăng ký thành công, Chúng tôi đã gửi cho bạn một email kích hoạt tại địa chỉ email. Vui lòng kiểm tra hộp thư đến của bạn để hoàn thành</p>
+                <br />
+                <p className="text-green-700">Nếu bạn không nhận được email kích hoạt từ chúng tôi, vui lòng ấn <Button className="p-0 text-blue-600" variant="link" asChild ><Link to="/resend-activation">gửi lại</Link></Button> email kích hoạt</p>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Đang xử lý...
-                  </>
-                ) : (
-                  <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Đăng ký
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
-
+            </>
+          )}
         </CardContent>
-        <CardFooter className={cn("justify-between", className)}>
-          <hr className="flex-auto basis-auto" />
-          <span className="mx-3">Đăng nhập với</span>
-          <hr className="flex-auto m-0" />
-        </CardFooter>
-        <CardFooter className={cn("justify-between gap-2 mb-0", className)}>
-          <ButtonFB />
-          <ButtonGG />
-          <ButtonGithub />
-        </CardFooter>
+
+        {isRegistered && (
+          <>
+            <CardFooter className={cn("justify-between", className)}>
+              <hr className="flex-auto basis-auto" />
+              <span className="mx-3">Đăng nhập với</span>
+              <hr className="flex-auto m-0" />
+            </CardFooter>
+            <CardFooter className={cn("justify-between gap-2 mb-0", className)}>
+              <ButtonFB />
+              <ButtonGG />
+              <ButtonGithub />
+            </CardFooter>
+          </>
+        )}
       </Card>
-    </div >
-  )
+    </div>
+  );
 }

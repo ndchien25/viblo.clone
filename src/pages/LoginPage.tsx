@@ -38,7 +38,7 @@ import { useNavigate } from "react-router-dom"
 type CardProps = React.ComponentProps<typeof Card>
 export default function LoginPage({ className, ...props }: CardProps) {
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Thêm state để lưu thông báo lỗi
+  const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null); // Thêm state để lưu thông báo lỗi
   const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -54,8 +54,19 @@ export default function LoginPage({ className, ...props }: CardProps) {
 
     setLoading(true)
     const result = await loginService(data, (err: any) => {
-      
-      setErrorMessage(err.data.message)
+      if (!err.data?.verify) {
+        setErrorMessage(
+          <>
+            <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{err.data?.message} <Link className="text-blue-600 hover:underline" to="/send-activation">Gửi lại</Link></span></div>
+          </>
+        )
+      } else {
+        setErrorMessage(
+          <>
+            <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{err.data?.message}</span></div>
+          </>
+        )
+      }
       setLoading(false)
     })
     if (result) {
@@ -70,7 +81,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
           <img className="w-[120px] " src={logo} />
           <CardTitle className={cn("text-xl text-slate-700", className)}>Đăng nhập với Viblo</CardTitle>
           {errorMessage && ( // Hiển thị thông báo lỗi nếu có
-            <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{errorMessage}</span></div>
+            errorMessage
           )}
         </CardHeader>
         <CardContent className="grid gap-3">

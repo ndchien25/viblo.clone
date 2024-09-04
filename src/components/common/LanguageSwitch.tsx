@@ -27,7 +27,7 @@ export default function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="items-center text-black space-x-2 bg-white hover:bg-gray-100 focus:outline-none">
+        <Button className="items-center text-black space-x-2 bg-white hover:bg-gray-100 focus-visible:ring-0 focus-visible:ring-offset-0">
           <img
             src={getImage(selectedLanguage)}
             className="w-6 h-6 rounded-full"
