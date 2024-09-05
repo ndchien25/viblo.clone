@@ -125,4 +125,11 @@
   .scrollbar-thin::-webkit-scrollbar-track {
     background: #f1f1f1; /* Background color of the track */
   }
+
+  .challenge-rank-E {
+    @apply text-[#80ad69] border-2 border-[#80ad69] bg-[#80ad69]/[.16]
+  }
+  .suggestion-item-tags {
+    @apply px-[1px] py-[10px] bg-[#f4f4f5] mr-2 rounded text-[#909399] max-w-60
+  }
 }

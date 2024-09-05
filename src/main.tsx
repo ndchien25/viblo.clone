@@ -11,9 +11,10 @@ import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPassord';
 import { Homepage } from './pages/Homepage';
-import Layout from './components/layouts/layouts';
 import VerifyEmail from './pages/SendVerifyEmaiPage';
 import ResetPassword from './pages/ResetPasswordPage';
+import MainLayout from './layouts/MainLayout';
+import MinimalLayout from './layouts/MinimalLayout';
 
 const router = createBrowserRouter([
   {
@@ -38,13 +39,21 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <Layout />,
+    element: <MainLayout />,
     children: [
       {
         path: "newest",
         element: <Homepage />
+      },
+      {
+        path: "followings",
+        element: <Homepage />
       }
     ]
+  },
+  {
+    path: '/publish/post',
+    element: < MinimalLayout/>
   }
 ]);
 createRoot(document.getElementById('root')!).render(

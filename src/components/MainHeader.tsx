@@ -26,8 +26,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import LanguageSwitcher from "../common/LanguageSwitch";
-import AvatarDropdownMenu from "../common/AvatarDropdownMenu";
+import LanguageSwitcher from "@/components/LanguageSwitch";
+import AvatarDropdownMenu from "@/components/AvatarDropdownMenu";
 
 export default function MainHeader() {
 
@@ -295,4 +295,3 @@ export default function MainHeader() {
     </header >
   )
 }
-

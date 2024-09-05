@@ -1,14 +1,13 @@
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 
 export default function LanguageSwitcher() {
-  const [selectedLanguage, setSelectedLanguage] = useState('VN'); // Default language is Vietnamese
+  const [selectedLanguage, setSelectedLanguage] = useState('VN');
 
   const changeLanguage = (language:string) => {
     setSelectedLanguage(language);
-    // You can add logic here to change the language in your app (e.g., update i18n settings)
     console.log("Language changed to:", language);
   };
   const getImage = (language: string) => {
@@ -66,7 +65,6 @@ export default function LanguageSwitcher() {
             <span className="font-semibold">FR - French</span>
           </div>
         </DropdownMenuItem>
-        {/* Add more languages as needed */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

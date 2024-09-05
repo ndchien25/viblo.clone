@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { NavigationMenuItem } from "../ui/navigation-menu";
+import { NavigationMenuItem } from "@/components/ui/navigation-menu";
 
 interface NavItemProps {
   path: string;
