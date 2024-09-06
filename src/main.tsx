@@ -9,12 +9,13 @@ import {
 
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
-import ForgotPasswordPage from './pages/ForgotPassord';
-import { Homepage } from './pages/Homepage';
-import VerifyEmail from './pages/SendVerifyEmaiPage';
-import ResetPassword from './pages/ResetPasswordPage';
-import MainLayout from './layouts/MainLayout';
-import MinimalLayout from './layouts/MinimalLayout';
+import ForgotPasswordPage from '@/pages/ForgotPassordPage';
+import { Homepage } from '@/pages/Homepage';
+import VerifyEmail from '@/pages/SendVerifyEmaiPage';
+import ResetPassword from '@/pages/ResetPasswordPage';
+import MainLayout from '@/layouts/MainLayout';
+import MinimalLayout from '@/layouts/MinimalLayout';
+import PublishPostPage from './pages/PublishPostPage';
 
 const router = createBrowserRouter([
   {
@@ -52,8 +53,14 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: '/publish/post',
-    element: < MinimalLayout/>
+    path: '/publish',
+    element: < MinimalLayout/>,
+    children: [
+      {
+        path: "post",
+        element: < PublishPostPage/>
+      }
+    ]
   }
 ]);
 createRoot(document.getElementById('root')!).render(

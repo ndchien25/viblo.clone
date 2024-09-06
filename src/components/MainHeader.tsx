@@ -249,14 +249,18 @@ export default function MainHeader() {
             <DropdownMenuContent>
               <Separator />
               <DropdownMenuItem>
-                <Pen className="mr-4 h-4 w-4" />
-                <span>Write post</span>
+                <Link to="/publish/post" className="flex">
+                  <Pen className="mr-4 h-4 w-4" />
+                  <span>Write post</span>
+                </Link>
               </DropdownMenuItem>
               <Separator />
 
               <DropdownMenuItem>
-                <List className="mr-4 h-4 w-4" />
-                <span>New series</span>
+                <Link to="/publish/series" className="flex">
+                  <List className="mr-4 h-4 w-4" />
+                  <span>New series</span>
+                </Link>
               </DropdownMenuItem>
               <Separator />
 
