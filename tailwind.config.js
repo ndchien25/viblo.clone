@@ -73,10 +73,31 @@ module.exports = {
       },
       maxHeight: {
         'custom-calc': 'calc(-88px + 100vh)',
+      },
+      gridTemplateColumns: {
+        '16': 'repeat(16, minmax(0, 1fr))',
+      },
+      gridColumn: {
+        'span-16': 'span 16 / span 16',
+      },
+      gridColumnStart: {
+        '13': '13',
+        '14': '14',
+        '15': '15',
+        '16': '16',
+        '17': '17',
+      },
+      gridColumnEnd: {
+        '13': '13',
+        '14': '14',
+        '15': '15',
+        '16': '16',
+        '17': '17',
       }
     },
   },
   plugins: [
     require("tailwindcss-animate"),
+    require('@tailwindcss/typography'),
   ],
 }

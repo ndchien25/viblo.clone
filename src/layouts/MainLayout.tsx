@@ -19,7 +19,7 @@ const MainLayout: React.FC = () => {
           </Link>
         </div>
       </div>
-      <div className="container">
+      <div className="max-w-7xl items-center justify-center m-auto px-7">
         <Outlet />
       </div>
       <Footer />

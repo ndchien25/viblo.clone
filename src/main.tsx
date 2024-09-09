@@ -49,17 +49,23 @@ const router = createBrowserRouter([
       {
         path: "followings",
         element: <Homepage />
-      }
+      },
+      {
+        path: '/p/:slug',
+        element: <Homepage />
+      },
     ]
   },
+ 
   {
-    path: '/publish',
+    path: '/',
     element: < MinimalLayout/>,
     children: [
       {
-        path: "post",
+        path: "/publish/post",
         element: < PublishPostPage/>
-      }
+      }, 
+     
     ]
   }
 ]);

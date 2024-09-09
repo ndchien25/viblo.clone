@@ -41,10 +41,14 @@ export default function PublishPostPage() {
     mode: "onTouched",
     defaultValues: {
       title: "",
-      tag: [],
+      tags: [],
       content: '',
     },
   });
+  const hasErrors =
+    !!form.formState.errors.title ||
+    !!form.formState.errors.tags ||
+    !!form.formState.errors.content;
 
   const onSubmit = async (data: PostCreate) => {
     const response = await createPostService(data, (err: any) => {
@@ -89,7 +93,6 @@ export default function PublishPostPage() {
                   <FormControl>
                     <Input className="focus-visible:rounded-r focus-visible:ring-1 focus-visible:ring-offset-0" placeholder="Title" {...field} />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -101,7 +104,7 @@ export default function PublishPostPage() {
             <div className="flex flex-col flex-auto">
               <FormField
                 control={form.control}
-                name="tag"
+                name="tags"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -109,7 +112,6 @@ export default function PublishPostPage() {
                         value={field.value}
                         onChange={(tags: Tag[]) => field.onChange(tags)} />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -121,9 +123,30 @@ export default function PublishPostPage() {
               <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>
                 <Link target="_blank" to="/">Thay đổi ảnh thu nhỏ</Link>
               </Button>
-              <Button type="submit" className="bg-white text-black hover:text-blue-500 hover:bg-slate-100">
-                Xuất bản bài viết
-              </Button>
+              {hasErrors ? (
+                <Button
+                  type="submit"
+                  className={cn(
+                    "bg-white text-black hover:text-blue-500 hover:bg-slate-100",
+                    { "cursor-not-allowed opacity-50": hasErrors }
+                  )}
+                  disabled={hasErrors}
+                >
+                  Xuất bản bài viết{" "}
+                  <span className="text-red-500">(Fix errors)</span>
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className={cn(
+                    "bg-white text-black hover:text-blue-500 hover:bg-slate-100",
+                    { "cursor-not-allowed opacity-50": hasErrors }
+                  )}
+                  disabled={hasErrors}
+                >
+                  "Xuất bản bài viết"
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>
