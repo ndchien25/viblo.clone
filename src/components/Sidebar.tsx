@@ -4,7 +4,6 @@ import React from "react"
 import { UserContainer } from "@/components/UserContainer";
 import Autoplay from "embla-carousel-autoplay"
 
-import { Card, CardContent } from "@/components/ui/card"
 import {
 	Carousel,
 	CarouselContent,

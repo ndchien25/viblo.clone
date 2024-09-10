@@ -16,6 +16,8 @@ import ResetPassword from '@/pages/ResetPasswordPage';
 import MainLayout from '@/layouts/MainLayout';
 import MinimalLayout from '@/layouts/MinimalLayout';
 import PublishPostPage from './pages/PublishPostPage';
+import GetPostPage from './pages/Post/GetPostPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -52,20 +54,24 @@ const router = createBrowserRouter([
       },
       {
         path: '/p/:slug',
-        element: <Homepage />
+        element: <GetPostPage />
       },
     ]
   },
- 
+
   {
     path: '/',
-    element: < MinimalLayout/>,
+    element: < MinimalLayout />,
     children: [
       {
         path: "/publish/post",
-        element: < PublishPostPage/>
-      }, 
-     
+        element: (
+          <ProtectedRoute>
+            <PublishPostPage />
+          </ProtectedRoute>
+        ),
+      },
+
     ]
   }
 ]);

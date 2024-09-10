@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronDown, ChevronUp, Eye, MessageCircleMore, Reply } from 'lucide-react'
+import { ChevronsUpDown, Eye, MessageCircleMore, Reply } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 interface SidebarFeedItemProps {
@@ -32,8 +32,7 @@ export const SidebarFeedItem: React.FC<SidebarFeedItemProps> = ({
         <div className="flex flex-wrap text-sm text-gray-500">
           <div className="flex items-center w-1/4 whitespace-nowrap" title="Điểm">
             <div className="flex flex-col items-center mr-2">
-              <ChevronUp width={18} height={18} />
-              <ChevronDown width={18} height={18} />
+              <ChevronsUpDown />
             </div>
             <span className="text-gray-500">{score}</span>
           </div>

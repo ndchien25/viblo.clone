@@ -35,11 +35,14 @@ import { LoginSchema } from "@/schemas/AuthSchema"
 import { z } from "zod"
 import { loginService } from "@/services/AuthService"
 import { useNavigate } from "react-router-dom"
+import { useAtom } from "jotai"
+import { authAtom } from '@/atoms/authAtoms';
 type CardProps = React.ComponentProps<typeof Card>
 export default function LoginPage({ className, ...props }: CardProps) {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null); // Thêm state để lưu thông báo lỗi
   const navigate = useNavigate()
+  const [, setAuth] = useAtom(authAtom);
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -54,7 +57,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
 
     setLoading(true)
     const result = await loginService(data, (err: any) => {
-      if (!err.data?.verify) {
+      if (!err.data?.verified) {
         setErrorMessage(
           <>
             <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{err.data?.message} <Link className="text-blue-600 hover:underline" to="/send-activation">Gửi lại</Link></span></div>
@@ -71,6 +74,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
     })
     if (result) {
       navigate('/newest')
+      setAuth(true)
     }
   };
 

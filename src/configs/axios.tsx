@@ -1,3 +1,4 @@
+import { hasCsrfCookie } from "@/helpers/checkCookie";
 import axios from "axios"
 
 const apiClient = axios.create({
@@ -12,9 +13,6 @@ const apiClient = axios.create({
     }
 })
 
-const hasCsrfCookie = () => {
-    return document.cookie.split(';').some((item) => item.trim().startsWith('XSRF-TOKEN='));
-};
 apiClient.interceptors.request.use(async (config) => {
     if (!hasCsrfCookie()) {
         await axios.get('https://api.viblo.clone/sanctum/csrf-cookie', { withCredentials: true });
