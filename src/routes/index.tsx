@@ -1,13 +1,13 @@
-import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
-import ForgotPasswordPage from '@/pages/ForgotPassordPage';
+import LoginPage from '@/pages/auth/LoginPage';
+import RegisterPage from '@/pages/auth/RegisterPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPassordPage';
 import { Homepage } from '@/pages/Homepage';
-import VerifyEmail from '@/pages/SendVerifyEmaiPage';
-import ResetPassword from '@/pages/ResetPasswordPage';
+import VerifyEmail from '@/pages/auth/SendVerifyEmaiPage';
+import ResetPassword from '@/pages/auth/ResetPasswordPage';
 import MainLayout from '@/layouts/MainLayout';
 import MinimalLayout from '@/layouts/MinimalLayout';
-import PublishPostPage from '@/pages/PublishPostPage';
-import GetPostPage from '@/pages/Post/GetPostPage';
+import PublishPostPage from '@/pages/posts/PublishPostPage';
+import GetPostPage from '@/pages/posts/GetPostPage';
 import RootLayout from '@/layouts/RootLayout';
 import PrivateRoute from '@/routes/private';
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
@@ -21,36 +21,21 @@ const router = createBrowserRouter(
       <Route path='/forgot-password' element={<ForgotPasswordPage />} />
       <Route path='/send-activation' element={<VerifyEmail />} />
       <Route path='/reset-password' element={<ResetPassword />} />
-      <Route path='/' element={
-        <PublicRoute>
-          < RootLayout />
-        </PublicRoute>
-      }>
-        <Route element={
-          <MinimalLayout />
-        }>
-          <Route
-            path="/publish/post"
-            element={
-              <PrivateRoute>
-                <PublishPostPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/p/:slug"
-            element={
-              <GetPostPage />
-            }
-          />
+
+      <Route path='/' element={<PublicRoute><RootLayout /></PublicRoute>}>
+        <Route element={<MinimalLayout />}>
+          <Route path="/p/:slug" element={<GetPostPage />} />
         </Route>
         <Route element={<MainLayout />}>
           <Route path="newest" element={<Homepage />} />
           <Route path="followings" element={<Homepage />} />
         </Route>
       </Route >
+
+      <Route path="/" element={<PrivateRoute><RootLayout /></PrivateRoute>}>
+        <Route path="publish/post" element={<PublishPostPage />} />
+      </Route>
     </Route >
   )
 )
-
 export default router

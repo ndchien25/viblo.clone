@@ -1,20 +1,36 @@
-import { useState } from 'react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"; // Import from your dropdown library
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Building, FileText, History, LogOut, Settings, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Building, FileText, History, LogOut, Settings, UserRound } from 'lucide-react';
+import { User } from "@/models/User";
+import { logout } from "@/services/AuthService";
+import { useToast } from "./ui/use-toast";
+import { useAtom } from "jotai";
+import { authAtom, userAtom } from "@/atoms/authAtoms";
+interface AvatarDropdownMenuProps {
+  user: User | null
+}
+export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
+  const { toast } = useToast()
+  const navigate = useNavigate()
+  const [, setUser] = useAtom(userAtom)
+  const [, setAuth] = useAtom(authAtom)
+  const handleLogout = async () => {
+    const response = await logout((err: any) => {
+      console.log(err);
+    })
+    console.log(response?.data);
 
-export default function AvatarDropdownMenu() {
-  const [user] = useState({
-    name: 'John Doe',
-    avatar: 'path-to-avatar-image.png', // Replace with the actual path to the avatar image
-    email: 'john.doe@example.com'
-  });
-
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log("User logged out");
+    if (!response?.data?.error) {
+      toast({
+        variant: "success",
+        title: response?.data?.message
+      })
+      setUser(null)
+      setAuth(false)
+      navigate("/newest")
+    }
   };
 
   const handleProfile = () => {
@@ -38,18 +54,18 @@ export default function AvatarDropdownMenu() {
       <DropdownMenuContent className='p-0'>
         <div className="flex items-center space-x-2 bg-slate-100 p-2">
           <Avatar className="w-14 h-14">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarImage src={user?.avatar} alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold text-lg">{user.name}</p>
-            <p className="text-sm text-gray-500">{user.email}</p>
+            <p className="font-semibold text-lg text-blue-400">{user?.display_name}</p>
+            <p className="text-sm text-gray-500">{'@' + user?.username}</p>
             <Button variant="outline" size="sm" className='h-auto py-2'><Link to="/" className='text-xs leading-none'>Edit</Link></Button>
           </div>
         </div>
         <DropdownMenuSeparator className="m-0 bg-slate-300" />
         <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <User className="mr-2 h-4 w-4" />
+          <UserRound className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">

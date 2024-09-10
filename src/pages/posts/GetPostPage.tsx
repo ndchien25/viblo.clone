@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Post } from "@/models/Post";
 import MarkdownViewer from "@/components/MarkdownViewer";
 import PostAction from "@/components/post/PostAction";
+import TagsList from "@/components/tag/TagList";
 
 export default function GetPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -83,13 +84,13 @@ export default function GetPostPage() {
                         <span>46</span>
                       </div>
                       <div className="mr-2 text-gray-500" title="Di chuyển đến bình luận">
-                        <Button type="button" className="bg-transparent flex hover:bg-gray-200 text-gray-500">
+                        <Button type="button" className="bg-transparent flex hover:bg-white text-gray-500">
                           <MessagesSquare />
                           <span>0</span>
                         </Button>
                       </div>
                       <div className="text-gray-500" title="Xem danh sách người bookmark">
-                        <Button type="button" className="bg-transparent flex hover:bg-gray-200 text-gray-500">
+                        <Button type="button" className="bg-transparent flex hover:bg-white text-gray-500">
                           <Bookmark />
                           <span>0</span>
                         </Button>
@@ -101,7 +102,11 @@ export default function GetPostPage() {
                 <h1 className="break-words font-bold text-5xl leading-tight">{post.title}</h1>
               </header>
               <div className="flex justify-between">
-                <div className="flex flex-wrap items-center"></div>
+                {post?.tags?.length ? (
+                  <TagsList tags={post.tags || []} />
+                ) : (
+                  <></>
+                )}
                 <div>
                   <Button className={cn("bg-white text-slate-400 hover:bg-white")} title="Hiện thị các hành động">
                     <Ellipsis size={30} strokeWidth={1.5} />
@@ -111,6 +116,11 @@ export default function GetPostPage() {
               <div className="flex-auto">
                 <MarkdownViewer content={post.content || ''} className="prose-stone prose-pre:bg-[#f1f2f3] prose-pre:border-[1px] prose-pre:text-black prose-lead:leading-none"></MarkdownViewer>
               </div>
+              {post?.tags?.length ? (
+                <TagsList tags={post.tags || []} />
+              ) : (
+                <></>
+              )}
               <p title="People cannot distribute, remix, adapt, and build upon this workwithout author's permission (or as permitted by fair use)." className="text-slate-500 mb-4">
                 All rights reserved
               </p>

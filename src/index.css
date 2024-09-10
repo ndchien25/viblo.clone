@@ -86,7 +86,7 @@
   }
 
   .navbar-menu {
-    @apply flex items-center flex-nowrap justify-between;
+    @apply flex items-center flex-nowrap justify-between h-12;
   }
 
   .nav-link {

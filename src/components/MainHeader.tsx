@@ -28,10 +28,11 @@ import {
 } from "@/components/ui/hover-card"
 import LanguageSwitcher from "@/components/LanguageSwitch";
 import AvatarDropdownMenu from "@/components/AvatarDropdownMenu";
-import { authAtom } from "@/atoms/authAtoms";
+import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { useAtom } from "jotai";
 export default function MainHeader() {
   const [auth,] = useAtom(authAtom);
+  const [user,] = useAtom(userAtom)
   return (
     <header className="sticky w-full top-0 z-50 bg-white shadow h-16 py-4 ">
       <div className="flex flex-row items-center justify-between mx-auto max-w-7xl gap-28 container">
@@ -280,11 +281,9 @@ export default function MainHeader() {
               </DropdownMenu>
             </>
           }
-
-
           <LanguageSwitcher />
           <DropdownMenu>
-            <DropdownMenuTrigger className=" focus:outline-none mr-7">
+            <DropdownMenuTrigger className="focus:outline-none mr-7">
               <div className="relative py-1">
                 <div className="-top-1 absolute left-2">
                   <p className="flex h-1 items-center justify-center rounded-full bg-red-400 p-2 text-xs text-white">new</p>
@@ -303,11 +302,11 @@ export default function MainHeader() {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
             </DropdownMenuContent>
           </DropdownMenu>
-          {auth && <AvatarDropdownMenu />}
+          {auth && <AvatarDropdownMenu user={user}/>}
           {!auth &&
             <Button className="bg-white hover:bg-white text-blue-400 hover:text-blue-300">
               <Link to="/login" className="flex">
-                <LogIn size={20}/>
+                <LogIn size={20} />
                 <span className="ml-2">Đăng nhập/đăng ký</span>
               </Link>
             </Button>

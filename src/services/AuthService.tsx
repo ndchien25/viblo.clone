@@ -41,4 +41,32 @@ const forgotPasswordService = async (data: any, onError: any) => {
     return null
   }
 }
-export { loginService, registerService, resendVerificationEmailService, forgotPasswordService }
+
+const authCheck = async (onError: any) => {
+  try {
+    const respone = await apiClient.get('/v1/me');
+    return respone
+  } catch (error: any) {
+    onError(error?.respone)
+    return null
+  }
+}
+
+const logout = async (onError: any) => {
+  try {
+    const respone = await apiClient.post('/v1/logout');
+    return respone
+  } catch (error: any) {
+    onError(error?.respone)
+    return null
+  }
+}
+
+export { 
+        loginService,
+        registerService, 
+        resendVerificationEmailService, 
+        forgotPasswordService, 
+        authCheck, 
+        logout 
+      }
