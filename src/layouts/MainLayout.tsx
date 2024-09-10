@@ -1,17 +1,11 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import MainHeader from "@/components/MainHeader";
 import Banner from "@/components/Banner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import useAuthCheck from "@/hooks/useAuthCheck";
-
 const MainLayout: React.FC = () => {
-  useAuthCheck()
   return (
-    <div className="flex flex-col min-h-screen">
-      <MainHeader />
+    <>
       <Banner />
       <div className="flex-auto">
         <Navbar />
@@ -25,8 +19,7 @@ const MainLayout: React.FC = () => {
         <Outlet />
       </div>
       <Footer />
-      <Toaster />
-    </div>
+    </>
   );
 };
 

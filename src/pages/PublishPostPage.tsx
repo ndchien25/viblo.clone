@@ -132,8 +132,7 @@ export default function PublishPostPage() {
                   )}
                   disabled={hasErrors}
                 >
-                  Xuất bản bài viết{" "}
-                  <span className="text-red-500">(Fix errors)</span>
+                  Xuất bản bài viết
                 </Button>
               ) : (
                 <Button
