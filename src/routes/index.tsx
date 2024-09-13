@@ -7,11 +7,11 @@ import ResetPassword from '@/pages/auth/ResetPasswordPage';
 import MainLayout from '@/layouts/MainLayout';
 import MinimalLayout from '@/layouts/MinimalLayout';
 import PublishPostPage from '@/pages/posts/PublishPostPage';
-import GetPostPage from '@/pages/posts/GetPostPage';
 import RootLayout from '@/layouts/RootLayout';
 import PrivateRoute from '@/routes/private';
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 import PublicRoute from './public';
+import PostDetailPage from '@/pages/posts/PostDetailPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,7 +24,7 @@ const router = createBrowserRouter(
 
       <Route path='/' element={<PublicRoute><RootLayout /></PublicRoute>}>
         <Route element={<MinimalLayout />}>
-          <Route path="/p/:slug" element={<GetPostPage />} />
+          <Route path="/p/:slug" element={<PostDetailPage />} />
         </Route>
         <Route element={<MainLayout />}>
           <Route path="newest" element={<Homepage />} />

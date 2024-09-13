@@ -3,6 +3,7 @@ import remarkGfm from 'remark-gfm';
 import CodeBlock from './CodeBlock';
 import { cn } from '@/lib/utils';
 import rehypeRaw from 'rehype-raw'
+import HeadingWithId from './sidebar/HeadingWithId';
 interface MarkdownViewerProps {
   content: string;
   className?: string;
@@ -21,7 +22,13 @@ export default function MarkdownViewer({ content, className }: MarkdownViewerPro
           return (
             <CodeBlock value={value} language={language} className={''} />
           )
-        }
+        },
+        h1: (props) => <HeadingWithId level={1} {...props} />,
+        h2: (props) => <HeadingWithId level={2} {...props} />,
+        h3: (props) => <HeadingWithId level={3} {...props} />,
+        h4: (props) => <HeadingWithId level={4} {...props} />,
+        h5: (props) => <HeadingWithId level={5} {...props} />,
+        h6: (props) => <HeadingWithId level={6} {...props} />,
       }}
     >
       {content}

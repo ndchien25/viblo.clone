@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { SidebarFeedItem } from "@/components/SidebarFeedItem"
 import React from "react"
 import { UserContainer } from "@/components/UserContainer";
@@ -8,16 +8,23 @@ import {
 	Carousel,
 	CarouselContent,
 	CarouselItem,
-	CarouselNext,
-	CarouselPrevious,
 } from "@/components/ui/carousel"
-import useEmblaCarousel from 'embla-carousel-react'
 import { CircleCheck, Crown, Star } from "lucide-react";
-export default function Sidebar() {
+import TOC from "./sidebar/TOC";
+import Header from "@/models/Header";
+
+interface SidebarProps {
+	headers: Header[];
+	title: string;
+}
+export default function Sidebar({ headers }: SidebarProps) {
+	const location = useLocation();
+	const currentPath = location.pathname;
+	const isPostPage = /^\/p\/[^/]+$/.test(currentPath);
+
 	const plugin = React.useRef(
 		Autoplay({ delay: 2000, stopOnInteraction: true })
 	)
-	const [emblaRef] = useEmblaCarousel()
 	const feedItems = [
 		{
 			questionUrl: "/q/AZoJjw1yLY7",
@@ -86,6 +93,17 @@ export default function Sidebar() {
 	return (
 		<div className="h-full">
 			<div className="sticky overflow-x-hidden top-20 max-h-[calc(100vh-88px)] scrollbar-thin">
+				{isPostPage && (
+					<>
+						<div className="flex">
+							<h4 className="text-lg uppercase">Mục lục</h4>
+							<hr className="flex-grow ml-4 my-4 border-0 border-t border-[rgba(27,27,27,0.1)]" />
+						</div>
+						<ul className="list-none space-y-2">
+							<TOC headers={headers} />
+						</ul>
+					</>
+				)}
 				<div className="flex">
 					<Link className="uppercase" to="/"><h4 className="text-lg text-blue-600">Câu hỏi mới nhất</h4></Link>
 					<hr className="flex-grow ml-4 my-4 border-0 border-t border-[rgba(27,27,27,0.1)]" />

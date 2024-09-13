@@ -1,15 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ExternalLink } from "lucide-react";
@@ -33,9 +27,8 @@ import { Tag } from "@/schemas/TagSchema";
 
 export default function PublishPostPage() {
   const { toast } = useToast();
-  const delay = 1000;
-  const autosavedValue = localStorage.getItem(`smde_viblo`) || "";
-
+  const delay = 1000; // Delay for autosave in milliseconds
+  const [errors, setErrors] = useState<boolean>(true);
   const form = useForm<PostCreate>({
     resolver: zodResolver(postCreateSchema),
     mode: "onTouched",
@@ -45,10 +38,45 @@ export default function PublishPostPage() {
       content: '',
     },
   });
-  const hasErrors =
-    !!form.formState.errors.title ||
-    !!form.formState.errors.tags ||
-    !!form.formState.errors.content;
+
+  useEffect(() => {
+    const savedTitle = localStorage.getItem('post_title') || "";
+    const savedTags = JSON.parse(localStorage.getItem('post_tags') || '[]');
+    const savedContent = localStorage.getItem('post_content') || "";
+
+    form.reset({
+      title: savedTitle,
+      tags: savedTags,
+      content: savedContent,
+    });
+  }, [form]);
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (errors) return;
+
+      // Save values to localStorage with delay
+      const timeout = setTimeout(() => {
+        localStorage.setItem('post_title', values.title || '');
+        localStorage.setItem('post_tags', JSON.stringify(values.tags));
+        localStorage.setItem('post_content', values.content || '');
+      }, delay);
+
+      return () => clearTimeout(timeout);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, delay, errors]);
+
+  useEffect(() => {
+    const { title, tags, content } = form.getValues();
+
+    if (title && tags.length > 0 && content) {
+      setErrors(false);
+    } else {
+      setErrors(true);
+    }
+  }, [form.getValues()]);
 
   const onSubmit = async (data: PostCreate) => {
     const response = await createPostService(data, (err: any) => {
@@ -71,14 +99,9 @@ export default function PublishPostPage() {
     return {
       autofocus: true,
       spellChecker: false,
-      autosave: {
-        enabled: true,
-        uniqueId: "demo",
-        delay,
-      },
       placeholder: `Cú pháp Markdown được hỗ trợ. Nhấp vào ? để xem hướng dẫn.\nĐể xuống dòng, sử dụng thẻ <br> hoặc Enter hai lần.\nNhấp vào 👁 hoặc nhấn "Ctrl + P" để bật/tắt chế độ xem trước.\nNhấp vào ▯▯ hoặc nhấn "F9" để bật/tắt chế độ xem trước song song với soạn thảo.\nNhấp vào 🕂 hoặc nhấn "F11" để bật/tắt chế độ toàn màn hình.\nĐể highlight các đoạn code, hãy viết thêm tên viết thường của ngôn ngữ sau ba dấu gạch ngược (ví dụ: \`\`\`ruby)`,
     };
-  }, [delay]);
+  }, []);
 
   return (
     <div className="bg-[#f6f6f7] p-3">
@@ -117,48 +140,34 @@ export default function PublishPostPage() {
               />
             </div>
             <div className="flex gap-3 font-normal">
-              <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100", "hidden")}>
+              <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100", 'hidden')}>
                 <Link target="_blank" to="/">Cài đặt SEO</Link>
               </Button>
-              <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>
+              <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100")} disabled={errors}>
                 <Link target="_blank" to="/">Thay đổi ảnh thu nhỏ</Link>
               </Button>
-              {hasErrors ? (
-                <Button
-                  type="submit"
-                  className={cn(
-                    "bg-white text-black hover:text-blue-500 hover:bg-slate-100",
-                    { "cursor-not-allowed opacity-50": hasErrors }
-                  )}
-                  disabled={hasErrors}
-                >
-                  Xuất bản bài viết
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  className={cn(
-                    "bg-white text-black hover:text-blue-500 hover:bg-slate-100",
-                    { "cursor-not-allowed opacity-50": hasErrors }
-                  )}
-                  disabled={hasErrors}
-                >
-                  "Xuất bản bài viết"
-                </Button>
-              )}
+
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button className={cn("bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>
-                    <ChevronDown className="mr-2 h-4 w-4" /> Options
+                  <Button
+                    className={cn(
+                      "bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>
+                    <ChevronDown className="mr-2 h-4 w-4" /> Xuất bản bài viết
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-60">
                   <DropdownMenuLabel>Xuất bản bài viết của bạn</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      Giấy phép: <Link to="/"></Link>
-                    </DropdownMenuItem>
+                    {errors ?
+                      <DropdownMenuItem>
+                        <span>Thêm tiêu đề, chọn ít nhất một thẻ và bắt đầu viết một cái gì đó để xuất bản.</span>
+                      </DropdownMenuItem>
+                      :
+                      <DropdownMenuItem>
+                        Giấy phép: <span title="This work is licensed under All Rights Reserved.">All rights reserved</span>
+                      </DropdownMenuItem>
+                    }
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -167,17 +176,19 @@ export default function PublishPostPage() {
           <FormField
             control={form.control}
             name="content"
-            render={() => (
+            render={({ field }) => (
               <FormItem>
                 <FormControl>
                   <SimpleMdeReact
-                    id="demo"
-                    value={autosavedValue}
-                    onChange={(value) => form.setValue("content", value)}
+                    id="viblo"
+                    value={form.getValues("content")}
+                    onChange={(value, changeObject) => {
+                      field.onChange(value);
+                      console.log('Change object:', changeObject);
+                    }}
                     options={autofocusNoSpellcheckerSaveOptions}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
