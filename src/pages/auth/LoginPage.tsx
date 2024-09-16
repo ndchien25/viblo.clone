@@ -33,49 +33,65 @@ import ButtonGithub from "@/components/social/ButtonGithub"
 
 import { LoginSchema } from "@/schemas/AuthSchema"
 import { z } from "zod"
-import { loginService } from "@/services/AuthService"
 import { useNavigate } from "react-router-dom"
 import { useAtom } from "jotai"
 import { authAtom } from '@/atoms/authAtoms';
+
+import {
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { loginService } from "@/services/AuthService"
+
 type CardProps = React.ComponentProps<typeof Card>
+
+// Ensure loginService returns a Promise that resolves to AxiosResponse
+type LoginData = z.infer<typeof LoginSchema>;
+
 export default function LoginPage({ className, ...props }: CardProps) {
-  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null); // Thêm state để lưu thông báo lỗi
   const navigate = useNavigate()
   const [, setAuth] = useAtom(authAtom);
+  const queryClient = useQueryClient();
 
-  const form = useForm<z.infer<typeof LoginSchema>>({
+  const form = useForm<LoginData>({
     resolver: zodResolver(LoginSchema),
     mode: "onTouched",
     defaultValues: {
       email_or_username: "",
       password: ""
     },
-  })
+  });
 
-  const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
-
-    setLoading(true)
-    const result = await loginService(data, (err: any) => {
-      if (!err.data?.verified) {
+  const loginMutation = useMutation({
+    mutationFn: (data: LoginData) => loginService(data), // First argument is the mutation function
+    onError: (err: any) => {
+      if (err.response?.data?.verified === false) {
         setErrorMessage(
-          <>
-            <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{err.data?.message} <Link className="text-blue-600 hover:underline" to="/send-activation">Gửi lại</Link></span></div>
-          </>
-        )
+          <div className="w-full p-3 bg-red-100 rounded">
+            <span className="text-red-500">
+              {err.response?.data?.message} <Link className="text-blue-600 hover:underline" to="/send-activation">Gửi lại</Link>
+            </span>
+          </div>
+        );
       } else {
         setErrorMessage(
-          <>
-            <div className="w-full p-3 bg-red-100 rounded"><span className="text-red-500">{err.data?.message}</span></div>
-          </>
-        )
+          <div className="w-full p-3 bg-red-100 rounded">
+            <span className="text-red-500">{err.response?.data?.message}</span>
+          </div>
+        );
       }
-      setLoading(false)
-    })
-    if (result) {
-      navigate('/newest')
-      setAuth(true)
+    },
+    onSuccess: () => {
+      setAuth(true);
+      queryClient.invalidateQueries({queryKey: ['auth']});
+      navigate('/newest');
     }
+  });
+
+  const onSubmit = (data: LoginData) => {
+    setErrorMessage(null); // Reset error message on submit
+    loginMutation.mutate(data);
   };
 
   return (
@@ -84,9 +100,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
         <CardHeader className={cn("items-center text-center")}>
           <img className="w-[120px] " src={logo} />
           <CardTitle className={cn("text-xl text-slate-700", className)}>Đăng nhập với Viblo</CardTitle>
-          {errorMessage && ( // Hiển thị thông báo lỗi nếu có
-            errorMessage
-          )}
+          {errorMessage && errorMessage} {/* Hiển thị thông báo lỗi nếu có */}
         </CardHeader>
         <CardContent className="grid gap-3">
           <Form {...form}>
@@ -123,8 +137,8 @@ export default function LoginPage({ className, ...props }: CardProps) {
                   )}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                {loginMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang xử lý...
@@ -155,6 +169,6 @@ export default function LoginPage({ className, ...props }: CardProps) {
           <ButtonGithub />
         </CardFooter>
       </Card>
-    </div >
-  )
+    </div>
+  );
 }

@@ -10,14 +10,13 @@ const LoginSchema = z.object({
 })
 
 const RegisterSchema = z.object({
-  display_name: z.string().min(1, {
-    message: "Tên là bắt buộc",
-  }).max(50,{
-    message: "Phải ít hơn 50 ký tự"
-  }),
+  display_name: z.string()
+    .min(1, { message: "Tên là bắt buộc" })
+    .max(50, { message: "Phải ít hơn 50 ký tự" })
+    .regex(/^[\p{L}\s-]+$/u, { message: "Tên không hợp lệ" }),
   username: z.string().min(1, {
     message: "Tên tài khoản là bắt buộc",
-  }).max(20,{
+  }).max(20, {
     message: "Phải it hơn 50 ký tự"
   }),
   email: z.string().min(1, {
@@ -29,7 +28,7 @@ const RegisterSchema = z.object({
     message: "Mật khẩu là bắt buộc"
   }).min(8, {
     message: "Mật khẩu phải có ít nhất 8 ký tự"
-  }).max(50 ,{
+  }).max(50, {
     message: "Phải ít hơn 50 ký tự"
   }),
   c_password: z.string().min(1, {
