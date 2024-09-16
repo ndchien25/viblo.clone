@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"; // Import from your dropdown library
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,38 +8,50 @@ import { logout } from "@/services/AuthService";
 import { useToast } from "./ui/use-toast";
 import { useAtom } from "jotai";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
+import { useMutation } from "@tanstack/react-query";
+
 interface AvatarDropdownMenuProps {
   user: User | null
 }
-export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
-  const { toast } = useToast()
-  const navigate = useNavigate()
-  const [, setUser] = useAtom(userAtom)
-  const [, setAuth] = useAtom(authAtom)
-  const handleLogout = async () => {
-    const response = await logout((err: any) => {
-      console.log(err);
-    })
-    console.log(response?.data);
 
-    if (!response?.data?.error) {
+export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [, setUser] = useAtom(userAtom);
+  const [, setAuth] = useAtom(authAtom);
+
+  // React Query mutation for logout
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: (response) => {
+      if (!response?.data?.error) {
+        toast({
+          variant: "success",
+          title: response?.data?.message,
+        });
+        setUser(null);
+        setAuth(false);
+        navigate("/newest");
+      }
+    },
+    onError: (error) => {
+      console.log(error);
       toast({
-        variant: "success",
-        title: response?.data?.message
-      })
-      setUser(null)
-      setAuth(false)
-      navigate("/newest")
-    }
+        variant: "destructive",
+        title: "Đăng xuất thất bại",
+      });
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   const handleProfile = () => {
-    // Handle profile navigation here
     console.log("Navigate to profile");
   };
 
   const handleSettings = () => {
-    // Handle settings navigation here
     console.log("Navigate to settings");
   };
 

@@ -30,13 +30,12 @@ import { RegisterSchema } from "@/schemas/AuthSchema";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { registerService } from "@/services/AuthService";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
 export default function RegisterPage({ className, ...props }: CardProps) {
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<Record<string, string>>({});
   const [isRegistered, setIsRegistered] = useState(false); // Track registration status
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -52,18 +51,27 @@ export default function RegisterPage({ className, ...props }: CardProps) {
     },
   });
 
-  const { clearErrors } = form;
+  const { clearErrors, handleSubmit, control } = form;
+
+  const mutation = useMutation({
+    mutationFn: (data: z.infer<typeof RegisterSchema>) => registerService(data),
+    onError: (err: any) => {
+      // Handle errors
+      console.log(err);
+      if (err.response?.data?.errors) {
+        setErrorMessage(err.response.data.errors);
+      }
+    },
+    onSuccess: () => {
+      setIsRegistered(true); // Update state to show success message
+    },
+  });
+
+  const [errorMessage, setErrorMessage] = useState<Record<string, string>>({});
 
   const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
-    setLoading(true);
-    const result = await registerService(data, (err: any) => {
-      setErrorMessage(err.data?.errors);
-      setLoading(false);
-    });
-    if (result) {
-      setIsRegistered(true); // Update state to show success message
-      setLoading(false);
-    }
+    setErrorMessage({}); // Clear previous errors
+    mutation.mutate(data);
   };
 
   return (
@@ -83,18 +91,18 @@ export default function RegisterPage({ className, ...props }: CardProps) {
         <CardContent className="grid gap-3">
           {!isRegistered ? (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <FormField
-                    control={form.control}
+                    control={control}
                     name="display_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input 
-                            {...field} 
-                            type="text" 
-                            placeholder="Tên người dùng" 
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Tên người dùng"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -103,7 +111,7 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                   />
                   <div className="flex gap-4">
                     <FormField
-                      control={form.control}
+                      control={control}
                       name="username"
                       render={({ field }) => (
                         <FormItem className="flex-1">
@@ -128,7 +136,7 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                       )}
                     />
                     <FormField
-                      control={form.control}
+                      control={control}
                       name="email"
                       render={({ field }) => (
                         <FormItem className="flex-1">
@@ -154,7 +162,7 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                     />
                   </div>
                   <FormField
-                    control={form.control}
+                    control={control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
@@ -166,7 +174,7 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={control}
                     name="c_password"
                     render={({ field }) => (
                       <FormItem>
@@ -178,7 +186,7 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={control}
                     name="term"
                     render={({ field }) => (
                       <FormItem>
@@ -205,8 +213,8 @@ export default function RegisterPage({ className, ...props }: CardProps) {
                     )}
                   />
                 </div>
-                <Button type="submit" className="float-end" disabled={loading}>
-                  {loading ? (
+                <Button type="submit" className="float-end" disabled={mutation.isPending}>
+                  {mutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Đang xử lý...

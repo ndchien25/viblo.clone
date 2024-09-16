@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -6,29 +6,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Check, Loader2 } from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { cn } from "@/lib/utils"
-import logo from "@/assets/img/logo_viblo.svg"
-import { useState } from "react"
-import { z } from "zod"
-import { resendVerificationEmailService } from "@/services/AuthService"
-import { ResetPasswordSchema } from "@/schemas/AuthSchema"
-import { Link } from "react-router-dom"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Check, Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { cn } from "@/lib/utils";
+import logo from "@/assets/img/logo_viblo.svg";
+import { z } from "zod";
+import { resendVerificationEmailService } from "@/services/AuthService";
+import { ResetPasswordSchema } from "@/schemas/AuthSchema";
+import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
-type CardProps = React.ComponentProps<typeof Card>
+type CardProps = React.ComponentProps<typeof Card>;
 
 export default function ResetPassword({ className, ...props }: CardProps) {
-  const [loading, setLoading] = useState(false)
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     mode: "onTouched",
@@ -36,15 +36,21 @@ export default function ResetPassword({ className, ...props }: CardProps) {
       password: "",
       c_password: ""
     },
-  })
+  });
+  const { toast } = useToast()
+  const mutation = useMutation({
+    mutationFn: (data: z.infer<typeof ResetPasswordSchema>) => resendVerificationEmailService(data),
+    onError: () => {
+      toast({
+        title: "Có lỗi khi gửi vui lòng gửi lại sau",
+      })
+    },
+  });
 
   const onSubmit = async (data: z.infer<typeof ResetPasswordSchema>) => {
-    setLoading(true)
-    await resendVerificationEmailService(data, (err: any) => {
-      console.log(err);   
-      setLoading(false)
-    })
-  }
+    mutation.mutate(data);
+  };
+
   return (
     <div className="flex flex-col justify-center items-center h-screen">
       <div className="mb-6">
@@ -100,8 +106,9 @@ export default function ResetPassword({ className, ...props }: CardProps) {
               <Button
                 type="submit"
                 className={cn("float-end")}
+                disabled={mutation.isPending} // Disable button while loading
               >
-                {loading ? (
+                {mutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang xử lý...
@@ -113,11 +120,13 @@ export default function ResetPassword({ className, ...props }: CardProps) {
                   </>
                 )}
               </Button>
-              <Button className={cn("float-end bg-white mr-2 text-black border-black hover:text-white")}><Link to="/login">Hủy bỏ</Link></Button>
+              <Button className={cn("float-end bg-white mr-2 text-black border-black hover:text-white")}>
+                <Link to="/login">Hủy bỏ</Link>
+              </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
