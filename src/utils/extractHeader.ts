@@ -16,8 +16,6 @@ async function extractHeaders(markdown: string): Promise<Header[]> {
     const id = text.toLowerCase().replace(/\s+/g, '-');
     headers.push({ level, text, id });
   });
-  console.log(headers);
-  
   return headers;
 }
 

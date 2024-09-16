@@ -1,13 +1,7 @@
-import { apiClient } from "@/configs/axios"
+import { apiClient } from "@/configs/axios";
+import { Tag } from "@/models/Tag";
 
-const searchTagService = async (query: string, onError: any) => {
-    try {
-        const response = await apiClient.get("/v1/tags/search", {params: {query}})
-        return response
-    } catch (error: any) {
-        onError(error?.response)
-        return null
-    }
-}
-
-export { searchTagService }
+export const searchTagService = async (search: string): Promise<Tag[] | null> => {
+    const response = await apiClient.get("/v1/tags/search", { params: { search } });
+    return response.data;
+};

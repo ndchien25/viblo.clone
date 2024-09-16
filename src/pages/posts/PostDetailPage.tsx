@@ -1,137 +1,106 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { getPostBySlugService } from "@/services/PostService";
-import { useEffect, useState } from "react";
-import { Post } from "@/models/Post";
-import PostDetail from "@/components/post/PostDetail";
-import PostAction from "@/components/post/PostAction";
-import Sidebar from "@/components/Sidebar";
-import { useAtom } from "jotai";
-import { authAtom } from "@/atoms/authAtoms";
-import { votePostService } from "@/services/VoteService";
-import extractHeaders from "@/utils/extractHeader";
-import Header from "@/models/Header";
-import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle } from "lucide-react";
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import PostDetail from '@/components/post/PostDetail';
+import PostAction from '@/components/post/PostAction';
+import Sidebar from '@/components/Sidebar';
+import { PostComment } from '@/components/post/PostComment';
+import { authAtom } from '@/atoms/authAtoms';
+import extractHeaders from '@/utils/extractHeader';
+import Header from '@/models/Header';
+import { Post } from '@/models/Post';
+import { getPostBySlugService, votePostService } from '@/services/PostService';
+import { createCommentService } from '@/services/CommentService';
 
 interface PostData {
   post: Post | null;
-  error: boolean;
   user_vote: 'up' | 'down' | null;
 }
 
+interface CommentCreate {
+  post_id: number;
+  content: string;
+  type: 'question' | 'post';
+  parent_id: number | null; 
+}
 export default function PostDetailPage() {
-  const [auth] = useAtom(authAtom)
+  const [auth] = useAtom(authAtom);
   const { slug } = useParams<{ slug: string }>();
-  const [post, setPost] = useState<Post | null>(null);
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [headers, setHeaders] = useState<Header[]>([]);
-  const navigate = useNavigate()
+
+  const { data, isLoading, error, isSuccess } = useQuery<PostData | null, Error>({
+    queryKey: ['PostBySlug'],
+    queryFn: () => getPostBySlugService(slug as string),
+  });
 
   useEffect(() => {
-    const fetchHeaders = async () => {
-      const headers = await extractHeaders(post?.content || '');
-      setHeaders(headers);
-    };
-    fetchHeaders();
-  }, [post?.content]);
+    extractHeaders(data?.post?.content || '').then(setHeaders);
+  }, [data, isSuccess])
 
-  useEffect(() => {
-    async function fetchPost() {
-      const postData: PostData = await getPostBySlugService(slug as string, (error: any) => {
-        console.log(error?.message);
-      });
-      if (postData === null) {
-        setError('Post not found');
-      } else {
-        setPost(postData.post);
-        setUserVote(postData.user_vote);
-      }
-      setLoading(false);  // Set loading to false after fetching
-    }
-    if (slug) {
-      fetchPost();
-    }
-  }, [slug]);
+  const mutation = useMutation({
+    mutationFn: async (vote: 'up' | 'down' | null) => { if (data?.post?.id) return votePostService(data?.post?.id, vote || 'none') },
+    onError: (error) => {
+      console.error('Error updating vote:', error);
+    },
+  })
 
-  const updateVote = async (vote: 'up' | 'down' | null) => {
+  const mutationComment = useMutation({
+    mutationFn: async (data: CommentCreate) => createCommentService(data),
+    onError: (error) => {
+      console.error('Error updating vote:', error);
+    },
+  })
+  
+  const handleCommentSubmit = (commentContent:string, commentParentId: number | null) => {
     if (!auth) {
-      return navigate('/login')
+      return navigate('/login');
     }
-    if (userVote === vote) {
-      setUserVote(null);
-    } else {
-      setUserVote(vote);
+    const payload: CommentCreate = {
+      post_id: data?.post?.id || 0, // Ensure to replace this with the correct post_id
+      content: commentContent,
+      type: 'post',
+      parent_id: commentParentId
+    };
+    mutationComment.mutate(payload);
+  };
+
+  const updateVote = (vote: 'up' | 'down' | null) => {
+    if (!auth) {
+      return navigate('/login');
     }
-    const newVote = userVote === vote ? null : vote;
-    setUserVote(newVote);
-
-    await votePostService(post?.id as unknown as string || '', newVote || 'none', (error: any) => {
-      console.error(error);
-    });
-    setPost((prevPost) => {
-      let newVoteValue = post?.vote || 0;
-
-      if (userVote === null) {
-        newVoteValue = vote === 'up' ? newVoteValue + 1 : newVoteValue - 1
-      }
-      if (userVote === vote) {
-        newVoteValue = vote === 'up' ? newVoteValue - 1 : newVoteValue + 1
-      }
-      if (userVote === 'up' && vote === 'down') {
-        newVoteValue -= 2;
-      } else if (userVote === 'down' && vote === 'up') {
-        newVoteValue += 2;
-      }
-      return {
-        ...prevPost,
-        vote: newVoteValue,
-      } as Post;;
-    });
-
+    mutation.mutate(vote);
   };
 
   return (
     <>
-      {post ? (
-        <div className="max-w-7xl items-center justify-center m-auto px-7">
+      {data?.post ? (
+        <div className="max-w-7xl items-center justify-center m-auto px-7 min-h-screen">
           <div className="grid grid-cols-16 pt-4 pb-4 gap-4">
             <div className="col-start-1 col-span-1">
-              {!loading &&
-                <PostAction user_vote={userVote} vote={post.vote || 0} onVote={(vote) => updateVote(vote)} />
-              }
+              <PostAction
+                user_vote={data.user_vote}
+                vote={data.post.vote || 0}
+                onVote={(vote) => updateVote(vote)}
+              />
             </div>
             <div className="col-start-2 col-end-13">
               <PostDetail
-                post={post}
-                loading={loading}
-                error={error}
+                post={data.post}
+                loading={isLoading}
+                error={error ? error.message : ''}
               />
             </div>
             <div className="col-start-13 col-span-4">
-              <Sidebar headers={headers} title={post.title || ''} />
+              <Sidebar headers={headers} title={data.post.title || ''} />
             </div>
           </div>
-          <div>
-            <p className="mb-2 font-bold text-xl">Bình luận</p>
-            
-            <Link to="/login">
-              <Card className="items-center flex mb-1 flex-col">
-                <CardContent className="flex-auto p-5">
-                  <span className="flex gap-2 text-slate-400 items-center">
-                    <MessageCircle size={16} />
-                    Đăng nhập để bình luận
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </div >
+          <PostComment onCommentSubmit={handleCommentSubmit} />
+        </div>
       ) : (
-        <div className="text-center text-red-500">{error || "Loading..."}</div>
-      )
-      }
+        <div className="text-center text-red-500">Post not found</div>
+      )}
     </>
   );
 }

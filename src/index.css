@@ -134,6 +134,6 @@
     @apply px-[1px] py-[10px] bg-[#f4f4f5] mr-2 rounded text-[#909399] max-w-60;
   }
 }
-#demo-wrapper .CodeMirror {
+#viblo-wrapper .CodeMirror {
   height: calc(100vh - 315px);
 }
