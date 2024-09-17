@@ -45,7 +45,25 @@ export default function PostDetailPage() {
     if (!auth) {
       return navigate('/login');
     }
-    mutation.mutate(vote);
+  
+    const newVote = vote === data?.user_vote ? null : vote;
+  
+    const previousVote = data?.user_vote;  // Store previous vote to roll back if necessary
+    const previousVoteCount = data?.post?.vote || 0;
+  
+    if (data && data.post) {
+      data.user_vote = newVote;
+  
+      if (newVote === 'up') {
+        data.post.vote = previousVote === 'down' ? previousVoteCount + 2 : previousVoteCount + 1;
+      } else if (newVote === 'down') {
+        data.post.vote = previousVote === 'up' ? previousVoteCount - 2 : previousVoteCount - 1;
+      } else {
+        // Undo vote
+        data.post.vote = previousVote === 'up' ? previousVoteCount - 1 : previousVoteCount + 1;
+      }
+    }
+    mutation.mutate(newVote);
   };
 
   return (
