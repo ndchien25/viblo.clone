@@ -11,19 +11,13 @@ import extractHeaders from '@/utils/extractHeader';
 import Header from '@/models/Header';
 import { Post } from '@/models/Post';
 import { getPostBySlugService, votePostService } from '@/services/PostService';
-import { createCommentService } from '@/services/CommentService';
 
 interface PostData {
   post: Post | null;
   user_vote: 'up' | 'down' | null;
 }
 
-interface CommentCreate {
-  post_id: number;
-  content: string;
-  type: 'question' | 'post';
-  parent_id: number | null; 
-}
+
 export default function PostDetailPage() {
   const [auth] = useAtom(authAtom);
   const { slug } = useParams<{ slug: string }>();
@@ -33,6 +27,7 @@ export default function PostDetailPage() {
   const { data, isLoading, error, isSuccess } = useQuery<PostData | null, Error>({
     queryKey: ['PostBySlug'],
     queryFn: () => getPostBySlugService(slug as string),
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -45,26 +40,6 @@ export default function PostDetailPage() {
       console.error('Error updating vote:', error);
     },
   })
-
-  const mutationComment = useMutation({
-    mutationFn: async (data: CommentCreate) => createCommentService(data),
-    onError: (error) => {
-      console.error('Error updating vote:', error);
-    },
-  })
-  
-  const handleCommentSubmit = (commentContent:string, commentParentId: number | null) => {
-    if (!auth) {
-      return navigate('/login');
-    }
-    const payload: CommentCreate = {
-      post_id: data?.post?.id || 0, // Ensure to replace this with the correct post_id
-      content: commentContent,
-      type: 'post',
-      parent_id: commentParentId
-    };
-    mutationComment.mutate(payload);
-  };
 
   const updateVote = (vote: 'up' | 'down' | null) => {
     if (!auth) {
@@ -96,7 +71,7 @@ export default function PostDetailPage() {
               <Sidebar headers={headers} title={data.post.title || ''} />
             </div>
           </div>
-          <PostComment onCommentSubmit={handleCommentSubmit} postId={data.post.id}/>
+          <PostComment postId={data.post.id}/>
         </div>
       ) : (
         <div className="text-center text-red-500">Post not found</div>

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { CommentWithReplies } from "@/models/Comment"; // Updated import
 import { formatDate } from "@/helpers/changeDate";
 import { ToolTip } from "../Tooltip";
 import MarkdownViewer from "../MarkdownViewer";
@@ -9,9 +8,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAtom } from "jotai";
 import { userAtom } from "@/atoms/authAtoms";
 import { cn } from "@/lib/utils";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getCommentChildService } from "@/services/CommentService";
+import { useState } from "react";
+import { Comment } from "@/models/Comment";
+import React from "react";
 
 interface CommentProps {
-  comment: CommentWithReplies;
+  comment: Comment;
   isRootComment?: boolean;
 }
 
@@ -19,7 +23,25 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
   const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
   const [currentUser] = useAtom(userAtom);
   const isCurrentUser = currentUser?.id === comment.user_id;
+  const [showReplies, setShowReplies] = useState(false);
+  const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    queryKey: ['GetCommentChild', comment.id],
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentChildService(comment.id, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
+    },
+    enabled: showReplies
+  });
 
+
+  const handleToggleReplies = () => {
+    if (!showReplies) {
+      setShowReplies(true); // Show replies
+    } else {
+      setShowReplies(false); // Hide replies
+    }
+  };
   return (
     <div className={cn("p-6 rounded", {
       'border-[#d6d6d7] border mb-4': isRootComment,
@@ -104,22 +126,38 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </footer>
-      {comment.replies && comment.replies.length > 0 &&
-        <div className="flex flex-col my-2 font-bold text-blue-600 hover:text-blue-800 cursor-pointer items-center">
-          <span className="flex items-center">
-            <ChevronDown size={14}/>
-            Xem thêm (4)
-          </span>
+      {comment.row_count > 0 &&
+        <div className="flex flex-col my-2 font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
+          <button onClick={handleToggleReplies} className="flex items-center">
+            <ChevronDown size={14} className={showReplies ? 'rotate-180' : ''} />
+            Xem tất cả trả lời ({comment.row_count})
+          </button>
         </div>}
-      {comment.replies && comment.replies.length > 0 && (
+      {showReplies && (
         <div className="pl-6">
-          {comment.replies.map((reply: CommentWithReplies) => (
-            <ContainerComment
-              key={reply.id}
-              comment={reply}
-              isRootComment={false}
-            />
-          ))}
+          {isLoading || isFetching ? (
+            <p>Loading...</p>
+          ) : (
+            data?.pages.map((page, i) => (
+              <React.Fragment key={i}>
+                {page.comments.map((reply) => (
+                  <ContainerComment
+                    key={reply.id}
+                    comment={reply}
+                    isRootComment={false}
+                  />
+                ))}
+                {hasNextPage && !isFetchingNextPage && (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    className="mt-2 text-blue-600 hover:underline"
+                  >
+                    Load more
+                  </button>
+                )}
+              </React.Fragment>
+            ))
+          )}
         </div>
       )}
     </div>

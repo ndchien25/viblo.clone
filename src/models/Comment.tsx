@@ -13,12 +13,8 @@ export type Comment = {
   user: User;
 };
 
-export type CommentWithReplies = Comment & {
-  replies?: Comment[];
-};
-
 export type CommentPaginationResponse = {
-  comments: CommentWithReplies[];
+  comments: Comment[];
   current_page: number;
   total_pages: number;
 };

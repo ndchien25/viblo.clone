@@ -1,60 +1,31 @@
-import { Link } from "react-router-dom"
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader } from "../ui/card"
-import { Image, MessageCircle, MessageCircleQuestionIcon, Smile } from "lucide-react"
-import { useAtom } from "jotai"
-import { authAtom } from "@/atoms/authAtoms"
-import { Textarea } from "../ui/textarea"
-import { Button } from "../ui/button"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import dataEmoji from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
-import { useRef, useState } from "react"
-import { cn } from "@/lib/utils"
-import MarkdownViewer from "../MarkdownViewer"
-import { getCommentService } from "@/services/CommentService";
+import { Link, useNavigate } from "react-router-dom";
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent } from "../ui/card";
+import { MessageCircle } from "lucide-react";
+import { useAtom } from "jotai";
+import { authAtom } from "@/atoms/authAtoms";
+import { CommentForm } from "./CommentForm";
+import { createCommentService, getCommentService } from "@/services/CommentService";
 import { ContainerComment } from "./ContainterComment";
+import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
+import { Comment } from "@/models/Comment";
 
 interface PostCommentProps {
-  onCommentSubmit: (commentContent: string, commentParentId: number | null) => void;
   postId: number;
 }
-export const PostComment: React.FC<PostCommentProps> = ({ onCommentSubmit, postId }) => {
-  const [auth] = useAtom(authAtom)
-  const [commentContent, setCommentContent] = useState<string>("");
-  const adjustTextareaHeight = (el: HTMLTextAreaElement) => {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  };
-  const [showPreview, setShowPreview] = useState(false)
-  const handleEmojiSelect = (emoji: { native: string }) => {
-    if (textareaRef.current) {
-      const start = textareaRef.current.selectionStart
-      const end = textareaRef.current.selectionEnd
-
-      const newValue = commentContent.slice(0, start) + emoji.native + commentContent.slice(end)
-      setCommentContent(newValue)
-      // Set the cursor position after the emoji
-      setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + emoji.native.length
-          adjustTextareaHeight(textareaRef.current)
-        }
-      }, 0)
-    }
-  }
-  const handlePreviewToggle = () => {
-    setShowPreview(!showPreview)
-  }
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  const maxCommentLength = 512;
-
-  const isCommentTooLong = commentContent.length > maxCommentLength;
+interface CommentCreate {
+  post_id: number;
+  content: string;
+  type: 'question' | 'post';
+  parent_id: number | null;
+}
+export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
+  const [auth] = useAtom(authAtom);
+  const navigate = useNavigate();
+  const [commentContent, setCommentContent] = useState<string>('')
+  const [comments, setComments] = useState<Comment[]>([])
+  const queryClient = useQueryClient()
 
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetComment', postId],
@@ -63,10 +34,38 @@ export const PostComment: React.FC<PostCommentProps> = ({ onCommentSubmit, postI
     getNextPageParam: (lastPage) => {
       return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
     },
+    refetchOnWindowFocus: false,
   });
-  const comments = data?.pages.flatMap(page => page.comments) || [];
-  
+  useEffect(() => {
+    if (data) {
+      setComments(data.pages.flatMap(page => page.comments));
+    }
+  }, [data]);
+  const { mutate } = useMutation({
+    mutationFn: async (data: CommentCreate) => createCommentService(data),
+  });
+
+
   if (isLoading && !isFetching) return <div>Loading...</div>;
+
+  const handleCommentSubmit = (commentContent: string, commentParentId: number | null) => {
+    if (!auth) {
+      return navigate('/login');
+    }
+    const payload: CommentCreate = {
+      post_id: postId, // Ensure to replace this with the correct post_id
+      content: commentContent,
+      type: 'post',
+      parent_id: commentParentId
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        setCommentContent('')
+        queryClient.invalidateQueries({ queryKey: ['GetComment', postId] })
+      },
+    });
+  };
+
   return (
     <>
       <p className="mb-4 font-bold text-xl">Bình luận</p>
@@ -81,93 +80,7 @@ export const PostComment: React.FC<PostCommentProps> = ({ onCommentSubmit, postI
         </Link>
       ) : (
         <>
-          <Card className="mb-4">
-            <CardHeader className="p-4">
-              <ul className="flex border-b border-gray-200">
-                <li className="mr-4">
-                  <button className={cn("text-gray-600 hover:text-blue-500 pb-2", !showPreview ? 'border-blue-500 border-b-2' : '')}
-                    onClick={() => setShowPreview(false)}
-                  >Viết</button>
-                </li>
-                <li>
-                  <button className={cn("text-gray-600 hover:text-blue-500 pb-2", showPreview ? 'border-blue-500 border-b-2' : '')}
-                    onClick={handlePreviewToggle}
-                  >Xem trước</button>
-                </li>
-              </ul>
-            </CardHeader>
-            <CardContent className="p-4">
-              {!showPreview ? (
-                <div className="flex gap-2 mb-4">
-                  <Link to="/u/ndchien2402" className="mr-2">
-                    <img
-                      src="https://images.viblo.asia/avatar/b005e7fb-6f4d-44df-a4f6-87350a1680ac.jpg"
-                      srcSet="https://images.viblo.asia/avatar-retina/b005e7fb-6f4d-44df-a4f6-87350a1680ac.jpg 2x"
-                      alt="Avatar"
-                      className="w-12 h-12 rounded-full"
-                    />
-                  </Link>
-                  <div className="w-full flex flex-wrap relative">
-                    <Textarea
-                      name="comment_contents"
-                      placeholder="Viết bình luận..."
-                      className="overflow-hidden break-words h-auto resize-none min-h-32 pt-2 pr-9 pb-8 pl-2 focus-visible:ring-offset-0"
-                      value={commentContent}
-                      ref={textareaRef}
-                      onChange={(e) => {
-                        setCommentContent(e.target.value)
-                        adjustTextareaHeight(e.target)
-                      }}
-                    />
-                    {isCommentTooLong && (
-                      <p className="text-red-500 mb-2">
-                        Bình luận của bạn đã vượt quá giới hạn {maxCommentLength} ký tự ({commentContent.length}/{maxCommentLength}).
-                      </p>
-                    )}
-                    <div className="flex items-center mt-2 absolute top-0 right-0 m-3 flex-col text-gray-400">
-                      <Popover>
-                        <PopoverTrigger>
-                          <button className="py-2" tabIndex={0} title="Biểu tượng cảm xúc đề xuất">
-                            <Smile size={19} />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full">
-                          <Picker data={dataEmoji} onEmojiSelect={handleEmojiSelect} />
-                        </PopoverContent>
-                      </Popover>
-
-                      <button className="py-2" title="Kéo hình ảnh hoặc nhấp để đính kèm">
-                        <Image size={19} />
-                      </button>
-                      <div>
-                        <button className="py-2" title="Hỗ trợ Markdown">
-                          <MessageCircleQuestionIcon size={19} />
-                        </button>
-                      </div>
-                      {/* <div className="mt-4 text-gray-500 hidden">Không có gì để xem trước!</div> */}
-
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                commentContent ? (
-                  <div className="flex-1 gap-2 mb-4">
-                    <MarkdownViewer content={commentContent} className="prose-stone prose-pre:bg-[#f1f2f3] prose-pre:border-[1px] prose-pre:text-black prose-lead:leading-none" />
-                  </div>
-                ) : (
-                  <p>Không có gì để xem trước</p>
-                )
-              )}
-              <div className="flex justify-end">
-                <Button onClick={() => onCommentSubmit(commentContent, null)} className="hover:bg-slate-500">
-                  Bình luận
-                </Button>
-              </div>
-            </CardContent>
-
-            <div className="mt-4"></div>
-
-          </Card>
+          <CommentForm onCommentSubmit={handleCommentSubmit} commentContent={commentContent} setCommentContent={setCommentContent} />
 
           {comments.length > 0 ? (
             comments.map((comment) => (
@@ -181,19 +94,20 @@ export const PostComment: React.FC<PostCommentProps> = ({ onCommentSubmit, postI
               </CardContent>
             </Card>
           )}
+
           {hasNextPage && (
             <div className="flex justify-center my-4">
-              <button
+              <Button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="text-blue-500 hover:text-blue-700 font-semibold"
+                className="text-blue-500 bg-white hover:text-blue-700 font-semibold w-full border p-3 hover:bg-blue-300"
               >
                 {isFetchingNextPage ? 'Loading more...' : 'Xem thêm'}
-              </button>
+              </Button>
             </div>
           )}
         </>
       )}
     </>
-  )
-}
+  );
+};
