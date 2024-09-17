@@ -96,7 +96,7 @@ export default function PostDetailPage() {
               <Sidebar headers={headers} title={data.post.title || ''} />
             </div>
           </div>
-          <PostComment onCommentSubmit={handleCommentSubmit} />
+          <PostComment onCommentSubmit={handleCommentSubmit} postId={data.post.id}/>
         </div>
       ) : (
         <div className="text-center text-red-500">Post not found</div>

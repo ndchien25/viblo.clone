@@ -1,5 +1,5 @@
 import { apiClient } from "@/configs/axios";
-import { Comment } from "@/models/Comment";
+import { Comment, CommentPaginationResponse } from "@/models/Comment";
 
 interface CommentCreate {
   post_id: number;
@@ -13,7 +13,12 @@ export const createCommentService = async (data: CommentCreate): Promise<Comment
   return response.data;
 };
 
-export const getCommentService = async (): Promise<Comment[]> => {
-  const response = await apiClient.get("/v1/comments");
+export const getCommentService = async (postId: number, page: number): Promise<CommentPaginationResponse> => {
+  const response = await apiClient.get(`/v1/comments/${postId}`, {
+    params: {
+      page: page
+    }
+  });
+
   return response.data
 }

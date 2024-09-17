@@ -12,3 +12,13 @@ export type Comment = {
   updated_at?: Date;
   user: User;
 };
+
+export type CommentWithReplies = Comment & {
+  replies?: Comment[];
+};
+
+export type CommentPaginationResponse = {
+  comments: CommentWithReplies[];
+  current_page: number;
+  total_pages: number;
+};
