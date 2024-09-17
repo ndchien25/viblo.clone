@@ -15,6 +15,7 @@ import { getPostBySlugService, votePostService } from '@/services/PostService';
 interface PostData {
   post: Post | null;
   user_vote: 'up' | 'down' | null;
+  comment_count: number;
 }
 
 
@@ -83,6 +84,7 @@ export default function PostDetailPage() {
                 post={data.post}
                 loading={isLoading}
                 error={error ? error.message : ''}
+                comment_count={data.comment_count}
               />
             </div>
             <div className="col-start-13 col-span-4">

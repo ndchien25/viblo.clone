@@ -1,4 +1,5 @@
 import { Tag } from "./Tag";
+import { User } from "./User";
 
 export type Post = {
     id: number;
@@ -16,4 +17,5 @@ export type Post = {
     created_at?: Date;
     updated_at?: Date;
     tags? : Tag[]
+    user: User;
 };

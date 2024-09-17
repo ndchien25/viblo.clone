@@ -10,7 +10,7 @@ export type User = {
     address?: string;
     phone?: string;
     university?: string;
-    follows_count?: number;
+    followers_count?: number;
     following_count?: number;
     total_view?: number;
     bookmark_count?: number;

@@ -6,14 +6,16 @@ import { Post } from "@/models/Post";
 import MarkdownViewer from "@/components/MarkdownViewer";
 import TagsList from "@/components/tag/TagList";
 import Skeleton from "../Skeleton";
+import { formatDate } from "@/helpers/changeDate";
 
 interface PostDetailProps {
   post: Post | null;
+  comment_count: number
   loading: boolean;
   error: string | null;
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error }) => {
+const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_count }) => {
   if (loading) {
     return <Skeleton />;
   }
@@ -32,9 +34,9 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error }) => {
         <div className="w-full flex flex-row">
           <div className="flex gap-2 break-words">
             <div className="flex relative flex-col">
-              <Link to="/" className="relative flex flex-col">
+              <Link to={`/u/${post.user.username}`} className="relative flex flex-col">
                 <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src={post.user.avatar} />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </Link>
@@ -42,8 +44,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error }) => {
             <div className="mr-1 leading-6">
               <div className="flex gap-3 mb-2">
                 <div className="flex">
-                  <Link to="" className="font-bold text-[#5488c7] mr-1">Nguyễn Duy Chiến</Link>
-                  <span className="text-[#9b9b9b] mr-1">@username</span>
+                  <Link to={`/u/${post.user.username}`} className="font-bold text-[#5488c7] mr-1">{post.user.display_name}</Link>
+                  <span className="text-[#9b9b9b] mr-1">{`@${post.user.username}`}</span>
                   <Button variant="outline" className="px-[10px] py-[5px] font-normal text-xs h-7"><span>Theo dõi</span></Button>
                 </div>
               </div>
@@ -54,7 +56,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error }) => {
                 </span>
                 <span className="max-h-5 flex items-center" title="Người theo dõi">
                   <UserPlus className="mr-1" size={16} opacity={0.5} />
-                  100
+                  {post.user.followers_count || 0}
                 </span>
                 <span className="max-h-5 flex items-center" title="Bài viết">
                   <Pencil className="mr-1" size={16} opacity={0.5} />
@@ -65,18 +67,18 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error }) => {
           </div>
           <div className="flex flex-col flex-wrap items-end flex-1 text-[#9b9b9b] text-[16px]">
             <div className="items-center" title="thg 9 6, 10:01 SA">
-              Đã đăng vào khoảng 5 giờ trước
+              {post.created_at ? formatDate(post.created_at.toString()) : "N/A"}
               <span title="10 phút đọc" className="font-normal before:content-['-'] before:mx-2">10 phút đọc</span>
             </div>
             <div className="flex items-center">
               <div className="mr-2 flex text-gray-500 p-2" title="Lượt xem: 46">
                 <View />
-                <span>46</span>
+                <span>{post.view_count || 0}</span>
               </div>
               <div className="mr-2 text-gray-500" title="Di chuyển đến bình luận">
                 <Button type="button" className="bg-transparent flex hover:bg-white text-gray-500">
                   <MessagesSquare />
-                  <span>0</span>
+                  <span>{comment_count}</span>
                 </Button>
               </div>
               <div className="text-gray-500" title="Xem danh sách người bookmark">
