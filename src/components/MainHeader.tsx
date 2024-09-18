@@ -44,7 +44,9 @@ export default function MainHeader() {
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Bài viết
+                  <Link to="/newest">
+                    Bài viết
+                  </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   Hỏi đáp
@@ -302,7 +304,7 @@ export default function MainHeader() {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
             </DropdownMenuContent>
           </DropdownMenu>
-          {auth && <AvatarDropdownMenu user={user}/>}
+          {auth && <AvatarDropdownMenu user={user} />}
           {!auth &&
             <Button className="bg-white hover:bg-white text-blue-400 hover:text-blue-300">
               <Link to="/login" className="flex">

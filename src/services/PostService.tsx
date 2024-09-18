@@ -22,3 +22,13 @@ type VoteType = 'up' | 'down' | 'none';
 export const votePostService = async (postId: number, vote: VoteType): Promise<void> => {
     await apiClient.post(`/v1/posts/${postId}/vote`, { vote });
 };
+
+export const getPostNewest = async (page: number, perPage = 15): Promise<any> => {
+    const response = await apiClient.get(`/v1/posts`, {
+        params: {
+            'page': page,
+            'perPage': perPage
+        }
+    });
+    return response.data
+}

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 interface TOCProps {
-  headers: Header[];
+  headers?: Header[];
 }
 
 const TOC: React.FC<TOCProps> = ({ headers }) => {
@@ -32,7 +32,7 @@ const TOC: React.FC<TOCProps> = ({ headers }) => {
       { threshold: 0.8 } // Adjust this threshold as needed
     );
 
-    headers.forEach(header => {
+    headers?.forEach(header => {
       const element = document.getElementById(header.id);
       if (element) {
         observer.observe(element);
@@ -41,7 +41,7 @@ const TOC: React.FC<TOCProps> = ({ headers }) => {
 
 
     return () => {
-      headers.forEach(header => {
+      headers?.forEach(header => {
         const element = document.getElementById(header.id);
         if (element) {
           observer.unobserve(element);
@@ -53,7 +53,7 @@ const TOC: React.FC<TOCProps> = ({ headers }) => {
   return (
     <ul className="list-none">
       {
-        headers.map(header => (
+        headers?.map(header => (
           <li
             className={cn("hover:text-blue-600 py-[5px]", activeId === header.id ? 'text-blue-600 font-bold' : 'text-gray-800')}
             key={header.id}

@@ -14,8 +14,8 @@ import TOC from "./sidebar/TOC";
 import Header from "@/models/Header";
 
 interface SidebarProps {
-	headers: Header[];
-	title: string;
+	headers?: Header[];
+	title?: string;
 }
 export default function Sidebar({ headers }: SidebarProps) {
 	const location = useLocation();

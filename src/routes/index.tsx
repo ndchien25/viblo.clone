@@ -12,6 +12,7 @@ import PrivateRoute from '@/routes/private';
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 import PublicRoute from './public';
 import PostDetailPage from '@/pages/posts/PostDetailPage';
+import NewestPage from '@/pages/Newest';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +28,7 @@ const router = createBrowserRouter(
           <Route path="/p/:slug" element={<PostDetailPage />} />
         </Route>
         <Route element={<MainLayout />}>
-          <Route path="newest" element={<Homepage />} />
+          <Route path="newest" element={<NewestPage />} />
           <Route path="followings" element={<Homepage />} />
         </Route>
       </Route >
