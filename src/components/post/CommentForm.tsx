@@ -13,18 +13,28 @@ import { userAtom } from "@/atoms/authAtoms";
 import { useAtom } from "jotai";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCommentService } from "@/services/CommentService";
 
 interface CommentFormProps {
-  onCommentSubmit: (commentContent: string, commentParentId: number | null) => void;
+  postId: number
   commentContent: string;
-  setCommentContent: (content: string) => void; // Changed to (content: string)
+  setCommentContent: (content: string) => void;
+  parentId: number | null;
+  setShowReplyForm: (show:boolean) => void;
 }
 
-export const CommentForm: React.FC<CommentFormProps> = ({ onCommentSubmit, commentContent, setCommentContent }) => {
-  const [user] = useAtom(userAtom);  // Destructure the user object
+interface CommentCreate {
+  post_id: number;
+  content: string;
+  type: 'question' | 'post';
+  parent_id: number | null;
+}
+export const CommentForm: React.FC<CommentFormProps> = ({setShowReplyForm ,parentId, postId, commentContent, setCommentContent }) => {
+  const [user] = useAtom(userAtom);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showPreview, setShowPreview] = useState(false);
-
+  const queryClient = useQueryClient()
   const maxCommentLength = 512;
   const isCommentTooLong = commentContent.length > maxCommentLength;
 
@@ -33,6 +43,28 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onCommentSubmit, comme
     el.style.height = el.scrollHeight + 'px';
   };
 
+  const { mutate } = useMutation({
+    mutationFn: async (data: CommentCreate) => createCommentService(data),
+  });
+
+  const handleCommentSubmit = () => {
+    const payload: CommentCreate = {
+      post_id: postId,
+      content: commentContent,
+      type: 'post',
+      parent_id: parentId
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        setCommentContent('')
+        if (!parentId) {
+          queryClient.invalidateQueries({ queryKey: ['GetComment', postId] })
+        } else {
+          queryClient.invalidateQueries({queryKey: ['GetCommentChild', parentId]})
+        }
+      },
+    });
+  };
   const handleEmojiSelect = (emoji: { native: string }) => {
     if (textareaRef.current) {
       const start = textareaRef.current.selectionStart;
@@ -92,7 +124,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onCommentSubmit, comme
                 value={commentContent}
                 ref={textareaRef}
                 onChange={(e) => {
-                  setCommentContent(e.target.value); // Fixed
+                  setCommentContent(e.target.value);
                   adjustTextareaHeight(e.target);
                 }}
               />
@@ -134,7 +166,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onCommentSubmit, comme
           )
         )}
         <div className="flex justify-end">
-          <Button onClick={() => onCommentSubmit(commentContent, null)} className="hover:bg-slate-500">
+          {parentId &&
+            <Button onClick={() => setShowReplyForm(false)} className="hover:bg-slate-500 mr-2">
+              Hủy
+            </Button>
+          }
+          <Button onClick={() => handleCommentSubmit()} className="hover:bg-slate-500">
             Bình luận
           </Button>
         </div>

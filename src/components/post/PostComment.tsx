@@ -1,11 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link } from "react-router-dom";
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { Card, CardContent } from "../ui/card";
 import { MessageCircle } from "lucide-react";
 import { useAtom } from "jotai";
 import { authAtom } from "@/atoms/authAtoms";
 import { CommentForm } from "./CommentForm";
-import { createCommentService, getCommentService } from "@/services/CommentService";
+import { getCommentService } from "@/services/CommentService";
 import { ContainerComment } from "./ContainterComment";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
@@ -14,19 +14,12 @@ import { Comment } from "@/models/Comment";
 interface PostCommentProps {
   postId: number;
 }
-interface CommentCreate {
-  post_id: number;
-  content: string;
-  type: 'question' | 'post';
-  parent_id: number | null;
-}
+
 export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
   const [auth] = useAtom(authAtom);
-  const navigate = useNavigate();
   const [commentContent, setCommentContent] = useState<string>('')
   const [comments, setComments] = useState<Comment[]>([])
-  const queryClient = useQueryClient()
-
+  const [, setShowReplyForm] = useState(false);
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetComment', postId],
     queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentService(postId, pageParam),
@@ -35,36 +28,15 @@ export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
       return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
     },
     refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
   });
   useEffect(() => {
     if (data) {
       setComments(data.pages.flatMap(page => page.comments));
     }
   }, [data]);
-  const { mutate } = useMutation({
-    mutationFn: async (data: CommentCreate) => createCommentService(data),
-  });
-
-
+  
   if (isLoading && !isFetching) return <div>Loading...</div>;
-
-  const handleCommentSubmit = (commentContent: string, commentParentId: number | null) => {
-    if (!auth) {
-      return navigate('/login');
-    }
-    const payload: CommentCreate = {
-      post_id: postId, // Ensure to replace this with the correct post_id
-      content: commentContent,
-      type: 'post',
-      parent_id: commentParentId
-    };
-    mutate(payload, {
-      onSuccess: () => {
-        setCommentContent('')
-        queryClient.invalidateQueries({ queryKey: ['GetComment', postId] })
-      },
-    });
-  };
 
   return (
     <>
@@ -80,7 +52,7 @@ export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
         </Link>
       ) : (
         <>
-          <CommentForm onCommentSubmit={handleCommentSubmit} commentContent={commentContent} setCommentContent={setCommentContent} />
+          <CommentForm setShowReplyForm={setShowReplyForm} parentId={null} postId={postId} commentContent={commentContent} setCommentContent={setCommentContent} />
 
           {comments.length > 0 ? (
             comments.map((comment) => (
