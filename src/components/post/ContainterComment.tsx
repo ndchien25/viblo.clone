@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator
 } from "../ui/dropdown-menu";
 import { useAtom } from "jotai";
-import { userAtom } from "@/atoms/authAtoms";
+import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { cn } from "@/lib/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getCommentChildService } from "@/services/CommentService";
@@ -28,6 +28,7 @@ interface CommentProps {
 }
 
 export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
+  const [auth] = useAtom(authAtom)
   const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
   const [currentUser] = useAtom(userAtom);
   const isCurrentUser = currentUser?.id === comment.user_id;
@@ -100,45 +101,51 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
           </ToolTip>
         </div>
         <span className="mx-2">|</span>
-        <ToolTip id={`replay-comment`} content="Trả lời">
-          <button onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline text-blue-300 mr-2">Trả lời</button>
-        </ToolTip>
+        {auth && (
+          <ToolTip id={`replay-comment`} content="Trả lời">
+            <button onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline text-blue-300 mr-2">Trả lời</button>
+          </ToolTip>
+        )}
+
         <div className="relative mr-2">
           <ToolTip id={`share-comment`} content="Chia sẻ đường dân của bình luận này">
             <Link to={`/c/${comment.id}`}>Chia sẻ</Link>
           </ToolTip>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-0"><Ellipsis /></button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              {isCurrentUser ? (
-                <>
+        {auth && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-0"><Ellipsis /></button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                {isCurrentUser ? (
+                  <>
+                    <DropdownMenuItem>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      <span>Sửa</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Trash className="mr-2 h-4 w-4" />
+                      <span>Xóa bình luận này</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
                   <DropdownMenuItem>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    <span>Sửa</span>
+                    <Flag className="mr-2 h-4 w-4" />
+                    <span>Báo cáo</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Trash className="mr-2 h-4 w-4" />
-                    <span>Xóa bình luận này</span>
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <DropdownMenuItem>
-                  <Flag className="mr-2 h-4 w-4" />
-                  <span>Báo cáo</span>
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <WandSparkles className="mr-2 h-4 w-4" />
-              <span>Bôi màu code tự động</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                )}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <WandSparkles className="mr-2 h-4 w-4" />
+                <span>Bôi màu code tự động</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
       </footer>
 
       {showReplyForm &&

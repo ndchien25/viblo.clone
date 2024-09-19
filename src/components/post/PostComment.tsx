@@ -35,50 +35,52 @@ export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
       setComments(data.pages.flatMap(page => page.comments));
     }
   }, [data]);
-  
+
   if (isLoading && !isFetching) return <div>Loading...</div>;
 
   return (
     <>
       <p className="mb-4 font-bold text-xl">Bình luận</p>
       {!auth ? (
-        <Link to="/login">
-          <Card className="flex items-center justify-center mb-4 p-4 bg-gray-100">
-            <CardContent className="flex items-center gap-2 text-gray-600">
-              <MessageCircle size={16} />
-              Đăng nhập để bình luận
-            </CardContent>
-          </Card>
-        </Link>
+        <>
+          <Link to="/login">
+            <Card className="mb-4 bg-gray-100">
+              <CardContent className="flex justify-center gap-2 p-3 text-gray-600">
+                <MessageCircle size={16} />
+                Đăng nhập để bình luận
+              </CardContent>
+            </Card>
+          </Link>
+
+        </>
       ) : (
         <>
           <CommentForm setShowReplyForm={setShowReplyForm} parentId={null} postId={postId} commentContent={commentContent} setCommentContent={setCommentContent} />
-
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <ContainerComment key={comment.id} comment={comment} isRootComment={comment.parent_id === null} />
-            ))
-          ) : (
-            <Card className="flex items-center justify-center mb-4 rounded-lg shadow-md">
-              <CardContent className="flex items-center gap-2 text-gray-600 p-2">
-                <MessageCircle size={16} />
-                Chưa có bình luận nào.
-              </CardContent>
-            </Card>
-          )}
-
-          {hasNextPage && (
-            <div className="flex justify-center my-4">
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={isFetchingNextPage}
-                className="text-blue-500 bg-white hover:text-blue-700 font-semibold w-full border p-3 hover:bg-blue-300"
-              >
-                {isFetchingNextPage ? 'Loading more...' : 'Xem thêm'}
-              </Button>
-            </div>
-          )}
         </>
+      )}
+      {comments.length > 0 ? (
+        comments.map((comment) => (
+          <ContainerComment key={comment.id} comment={comment} isRootComment={comment.parent_id === null} />
+        ))
+      ) : (
+        <Card className="flex items-center justify-center mb-4 rounded-lg shadow-md">
+          <CardContent className="flex items-center gap-2 text-gray-600 p-2">
+            <MessageCircle size={16} />
+            Chưa có bình luận nào.
+          </CardContent>
+        </Card>
+      )}
+
+      {hasNextPage && (
+        <div className="flex justify-center my-4">
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="text-blue-500 bg-white hover:text-blue-700 font-semibold w-full border p-3 hover:bg-blue-300"
+          >
+            {isFetchingNextPage ? 'Loading more...' : 'Xem thêm'}
+          </Button>
+        </div>
       )}
     </>
   );

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { SimpleMdeReact } from "react-simplemde-editor";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from '@tanstack/react-query';
 import "easymde/dist/easymde.min.css";
@@ -24,12 +24,17 @@ import { useToast } from "@/components/ui/use-toast";
 import Combobox from "@/components/Combobox";
 import { Tag } from "@/schemas/TagSchema";
 import { createPostService } from "@/services/PostService";
+import { Editor } from "codemirror";
+import { getObjectService, uploadService } from "@/services/FileService";
+import { handleFileUpload } from "@/helpers/handleFileUpload";
 
 export default function PublishPostPage() {
   const { toast } = useToast();
   const delay = 1000; // Delay for autosave in milliseconds
   const [errors, setErrors] = useState<boolean>(true);
   const [preview, setPreview] = useState<string>('');
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  const editorRef = useRef<Editor | null>(null);
   const form = useForm<PostCreate>({
     resolver: zodResolver(postCreateSchema),
     mode: "onTouched",
@@ -103,6 +108,14 @@ export default function PublishPostPage() {
         variant: 'success',
         title: data?.message || "success",
       });
+      localStorage.removeItem('post_title');
+      localStorage.removeItem('post_tags');
+      localStorage.removeItem('post_content');
+      form.reset({
+        title: "",
+        tags: [],
+        content: '',
+      });
     },
   });
 
@@ -110,6 +123,68 @@ export default function PublishPostPage() {
     mutation.mutate(data);
   };
 
+  const mutationUpload = useMutation({
+    mutationFn: async (file_name: string) => {
+      return uploadService(file_name)
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'destructive',
+        title: "Upload failed!",
+        description: error.message || "An error occurred while uploading the file.",
+      });
+    },
+    onSuccess: (async (data) => {
+      if (fileToUpload) {
+        try {
+          await handleFileUpload(fileToUpload, data.pre_signed);
+          const filePath = data.file_path;
+          const { url } = await getObjectService(filePath);
+
+          if (!url) {
+            throw new Error("Failed to fetch file URL");
+          }
+
+          if (editorRef.current) {
+            const doc = editorRef.current.getDoc();
+            const cursor = doc.getCursor();
+            doc.replaceRange(`![${fileToUpload.name}](${url})`, cursor);
+          }
+          toast({
+            variant: 'success',
+            title: "Upload successful!",
+            description: `File uploaded successfully.`,
+          });
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: "Upload failed!",
+            description: error.message || "An error occurred while uploading the file.",
+          });
+        } finally {
+          setFileToUpload(null);
+        }
+      }
+    })
+  });
+
+  const handleDrop = async (instance: Editor, event: DragEvent) => {
+    event.preventDefault();
+
+    const file = event.dataTransfer?.files[0];
+    if (file) {
+      setFileToUpload(file);
+      const fileExtension = file.name.split('.').pop();
+      if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
+        if (!fileExtension) {
+          throw new Error("File extension not available");
+        }
+        editorRef.current = instance;
+        await mutationUpload.mutateAsync(fileExtension)
+      }
+    }
+
+  };
   return (
     <div className="bg-[#f6f6f7] p-3">
       <Form {...form}>
@@ -205,6 +280,9 @@ export default function PublishPostPage() {
                       field.onChange(value);
                     }}
                     options={autofocusNoSpellcheckerSaveOptions}
+                    events={{
+                      drop: handleDrop, // Thêm sự kiện xử lý kéo thả ảnh
+                    }}
                   />
                 </FormControl>
               </FormItem>
