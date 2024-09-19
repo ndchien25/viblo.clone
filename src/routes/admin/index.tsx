@@ -2,7 +2,7 @@ import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { authCheck } from "@/services/AuthService";
 import { useAtom } from "jotai";
 import React, { useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -12,6 +12,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const [auth, setAuth] = useAtom(authAtom);
   const [user, setUser] = useAtom(userAtom)
   const navigate = useNavigate()
+  const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,9 +24,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       if (respone?.data?.authenticated) {
         setAuth(true);
         setUser(respone?.data?.user)
-        console.log(respone?.data?.user)
         if (respone?.data?.user?.role_id === 1) {
-          navigate('/admin')
+          if (!location.pathname.startsWith('/admin')) {
+            navigate('/admin/dashboard');
+          }
         } else {
           navigate('/newest')
         }

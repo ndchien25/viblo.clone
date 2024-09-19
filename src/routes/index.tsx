@@ -14,6 +14,7 @@ import PublicRoute from './public';
 import PostDetailPage from '@/pages/posts/PostDetailPage';
 import NewestPage from '@/pages/Newest';
 import AdminRoute from './admin';
+import AdminLayout from '@/layouts/AdminLayout';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,8 +38,14 @@ const router = createBrowserRouter(
       <Route path="/" element={<PrivateRoute><RootLayout /></PrivateRoute>}>
         <Route path="publish/post" element={<PublishPostPage />} />
       </Route>
-      <Route path="/admin" element={<AdminRoute><></></AdminRoute>}>
-        <Route path="dashboard" element={<></>}></Route>
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route path="dashboard">
+          <Route path="index" element={<></>} />
+        </Route>
+        <Route path="user">
+          <Route path="catalogue" element={<></>} />
+          <Route path="index" element={<></>} />
+        </Route>
       </Route>
     </Route >
   )

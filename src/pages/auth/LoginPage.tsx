@@ -90,7 +90,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
         setUser(data.user)
       }
       if (data.user.role_id === 1) {
-        navigate('/admin')
+        navigate('/admin/dashboard')
       } else {
         queryClient.invalidateQueries({ queryKey: ['auth'] });
         navigate('/newest');
