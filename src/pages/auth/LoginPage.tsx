@@ -35,7 +35,7 @@ import { LoginSchema } from "@/schemas/AuthSchema"
 import { z } from "zod"
 import { useNavigate } from "react-router-dom"
 import { useAtom } from "jotai"
-import { authAtom } from '@/atoms/authAtoms';
+import { authAtom, userAtom } from '@/atoms/authAtoms';
 
 import {
   useMutation,
@@ -52,6 +52,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
   const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null); // Thêm state để lưu thông báo lỗi
   const navigate = useNavigate()
   const [, setAuth] = useAtom(authAtom);
+  const [, setUser] = useAtom(userAtom);
   const queryClient = useQueryClient();
 
   const form = useForm<LoginData>({
@@ -82,10 +83,18 @@ export default function LoginPage({ className, ...props }: CardProps) {
         );
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data)
       setAuth(true);
-      queryClient.invalidateQueries({queryKey: ['auth']});
-      navigate('/newest');
+      if (data.user) {
+        setUser(data.user)
+      }
+      if (data.user.role_id === 1) {
+        navigate('/admin')
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['auth'] });
+        navigate('/newest');
+      }
     }
   });
 

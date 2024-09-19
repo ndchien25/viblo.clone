@@ -3,8 +3,9 @@ import { AxiosResponse } from 'axios';
 import { z } from "zod"
 import { apiClient } from "@/configs/axios"
 
-export const loginService = async (data: z.infer<typeof LoginSchema>): Promise<AxiosResponse<any>> => {
-  return apiClient.post("/v1/login", data);
+export const loginService = async (data: z.infer<typeof LoginSchema>): Promise<any> => {
+  const response = await apiClient.post("/v1/login", data)
+  return response.data;
 };
 
 export const registerService = async (data: z.infer<typeof RegisterSchema>): Promise<AxiosResponse<any>> => {

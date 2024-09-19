@@ -13,6 +13,7 @@ import { createBrowserRouter, createRoutesFromElements, Route } from 'react-rout
 import PublicRoute from './public';
 import PostDetailPage from '@/pages/posts/PostDetailPage';
 import NewestPage from '@/pages/Newest';
+import AdminRoute from './admin';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,9 @@ const router = createBrowserRouter(
 
       <Route path="/" element={<PrivateRoute><RootLayout /></PrivateRoute>}>
         <Route path="publish/post" element={<PublishPostPage />} />
+      </Route>
+      <Route path="/admin" element={<AdminRoute><></></AdminRoute>}>
+        <Route path="dashboard" element={<></>}></Route>
       </Route>
     </Route >
   )
