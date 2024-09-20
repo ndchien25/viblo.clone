@@ -15,6 +15,7 @@ import PostDetailPage from '@/pages/posts/PostDetailPage';
 import NewestPage from '@/pages/Newest';
 import AdminRoute from './admin';
 import AdminLayout from '@/layouts/AdminLayout';
+import { User } from '@/pages/admin/users/page';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -44,7 +45,7 @@ const router = createBrowserRouter(
         </Route>
         <Route path="user">
           <Route path="catalogue" element={<></>} />
-          <Route path="index" element={<></>} />
+          <Route path="index" element={<User/>} />
         </Route>
       </Route>
     </Route >

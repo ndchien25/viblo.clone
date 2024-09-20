@@ -22,8 +22,8 @@ const SideBar: React.FC = () => {
   }
   const defaultValue = getOpenAccordionValue()
   return (
-    <aside className="admin-sidebar w-60 bg-[#111c43] fixed h-full">
-      <div className="main-sidebar-header w-60 p-3.5 z-10 h-14 text-center border-solid border-b">
+    <div className="bg-[#111c43] w-60">
+      <div className="p-3.5 text-center border-solid border-b">
         <Link className="inline-block" to="/admin">
           <img className="h-8" src={logo} />
         </Link>
@@ -59,7 +59,7 @@ const SideBar: React.FC = () => {
           </div>
         ))}
       </div>
-    </aside>
+    </div>
   );
 };
 
