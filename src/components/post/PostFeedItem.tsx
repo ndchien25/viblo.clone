@@ -2,7 +2,12 @@ import { formatDate } from "@/helpers/changeDate";
 import { Post } from "@/models/Post"
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { ToolTip } from "../Tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Bookmark, ChevronsUpDown, Eye, Link2, MessageCircle } from "lucide-react";
 import TagsList from "../tag/TagList";
 
@@ -31,12 +36,22 @@ export const PostFeedItem: React.FC<PostFeedItemProps> = ({ post }) => {
             </span>
           </div>
           <div className="inline-flex flex-wrap items-center text-gray-500 mr-2">
-            <ToolTip id={`post-${post.id}`} content={post.created_at ? formatDate(post.created_at.toString()) : "N/A"}>
-              <span className="mr-2">{post.created_at ? formatDate(post.created_at.toString()) : "N/A"}</span>
-            </ToolTip>
-            <ToolTip id={`copy-${post.id}`} content="Sao chép URL">
-              <Link2 className="cursor-pointer" size={14} onClick={copyToClipboard} />
-            </ToolTip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger><span className="mr-2">{post.created_at ? formatDate(post.created_at.toString()) : "N/A"}</span></TooltipTrigger>
+                <TooltipContent>
+                  <p>{post.created_at ? formatDate(post.created_at.toString()) : "N/A"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger><Link2 className="cursor-pointer" size={14} onClick={copyToClipboard} /></TooltipTrigger>
+                <TooltipContent>
+                  <p>Sao chép URL</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
         <div className="flex flex-wrap">

@@ -7,6 +7,12 @@ import MarkdownViewer from "@/components/MarkdownViewer";
 import TagsList from "@/components/tag/TagList";
 import Skeleton from "../Skeleton";
 import { formatDate } from "@/helpers/changeDate";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface PostDetailProps {
   post: Post | null;
@@ -43,10 +49,10 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
             </div>
             <div className="mr-1 leading-6">
               <div className="flex gap-3 mb-2">
-                <div className="flex">
+                <div className="flex items-center">
                   <Link to={`/u/${post.user.username}`} className="font-bold text-[#5488c7] mr-1">{post.user.display_name}</Link>
                   <span className="text-[#9b9b9b] mr-1">{`@${post.user.username}`}</span>
-                  <Button variant="outline" className="px-[10px] py-[5px] font-normal text-xs h-7"><span>Theo dõi</span></Button>
+                  <Button variant="outline" className="text-xs h-7">Theo dõi</Button>
                 </div>
               </div>
               <div className="flex gap-[10px]">
@@ -65,7 +71,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
               </div>
             </div>
           </div>
-          <div className="flex flex-col flex-wrap items-end flex-1 text-[#9b9b9b] text-[16px]">
+          <div className="flex flex-col flex-wrap items-end flex-1 text-[#9b9b9b]">
             <div className="items-center" title="thg 9 6, 10:01 SA">
               {post.created_at ? formatDate(post.created_at.toString()) : "N/A"}
               <span title="10 phút đọc" className="font-normal before:content-['-'] before:mx-2">10 phút đọc</span>
@@ -76,13 +82,13 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
                 <span>{post.view_count || 0}</span>
               </div>
               <div className="mr-2 text-gray-500" title="Di chuyển đến bình luận">
-                <Button type="button" className="bg-transparent flex hover:bg-white text-gray-500">
+                <Button variant={'ghost'} className="flex hover:bg-white text-gray-500">
                   <MessagesSquare />
                   <span>{comment_count}</span>
                 </Button>
               </div>
               <div className="text-gray-500" title="Xem danh sách người bookmark">
-                <Button type="button" className="bg-transparent flex hover:bg-white text-gray-500">
+                <Button variant={'ghost'} className="flex hover:bg-white text-gray-500">
                   <Bookmark />
                   <span>0</span>
                 </Button>
@@ -95,37 +101,55 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
       <div className="flex justify-between mt-4">
         {post?.tags?.length ? (
           <TagsList tags={post.tags || []} />
-        ) : null}
-        <div>
-          <Button className="bg-white text-slate-400 hover:bg-white" title="Hiện thị các hành động">
+        ) : (
+          <div className="flex-1" />
+        )}
+        <div className="ml-auto">
+          <Button variant={'ghost'} className="bg-white text-slate-400 hover:bg-white" title="Hiển thị các hành động">
             <Ellipsis size={30} strokeWidth={1.5} />
           </Button>
         </div>
       </div>
       <div className="flex-auto mt-4">
-        <MarkdownViewer content={post.content || ''} className="prose-stone prose-pre:bg-[#f1f2f3] prose-pre:border-[1px] prose-pre:text-black prose-lead:leading-none" />
+        <MarkdownViewer content={post.content || ''} className="prose-stone prose-pre:bg-[#f1f2f3] prose-pre:border-[1px] prose-pre:text-slate-500 prose-lead:leading-none" />
       </div>
-      {post?.tags?.length ? (
-        <TagsList tags={post.tags || []} />
-      ) : null}
-      <p title="People cannot distribute, remix, adapt, and build upon this work without author's permission (or as permitted by fair use)." className="text-slate-500 mb-4">
-        All rights reserved
-      </p>
+      <div className="flex justify-between items-center mt-4">
+        {post?.tags?.length ? (
+          <TagsList tags={post.tags || []} />
+        ) : <div />}
+        <p
+          title="People cannot distribute, remix, adapt, and build upon this work without author's permission (or as permitted by fair use)."
+          className="text-slate-500 mb-4 ml-auto"
+        >
+          All rights reserved
+        </p>
+      </div>
+
       <div className="flex items-center justify-end mb-2">
         <div className="mr-4">
-          <Button className="text-gray-400 border-gray-300 h-0 w-0 p-4 hover:bg-white leading-none bg-white" title="Bookmark bài viết này">
-            <Link to="/">
-              <Facebook size={20} strokeWidth={1.5} />
-            </Link>
-          </Button>
-          <Button className="text-gray-400 border-gray-300 h-0 w-0 p-4 hover:bg-white leading-none bg-white" title="Bookmark bài viết này">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant={'ghost'} className="text-gray-400 border-gray-300 hover:bg-white">
+                  <Link to="/">
+                    <Facebook size={20} strokeWidth={1.5} />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Bookmark bài viết này</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <Button variant={'ghost'} className="text-gray-400 border-gray-300 hover:bg-white" title="Bookmark bài viết này">
             <Link to="/">
               <Twitter size={20} />
             </Link>
           </Button>
         </div>
         <div>
-          <Button className="bg-white text-slate-400 hover:bg-white" title="Hiện thị các hành động">
+          <Button variant={'ghost'} className="bg-white text-slate-400 hover:bg-white" title="Hiện thị các hành động">
             <Ellipsis size={30} />
           </Button>
         </div>

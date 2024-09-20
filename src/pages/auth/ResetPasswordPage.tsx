@@ -24,7 +24,7 @@ import { resendVerificationEmailService } from "@/services/AuthService";
 import { ResetPasswordSchema } from "@/schemas/AuthSchema";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 type CardProps = React.ComponentProps<typeof Card>;
 

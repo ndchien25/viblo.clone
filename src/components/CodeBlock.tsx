@@ -1,9 +1,9 @@
-// CodeBlock.js
 import React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Clipboard, ClipboardCheck } from 'lucide-react';
 
 interface CodeBlockProps {
   value: string;
@@ -20,18 +20,23 @@ const CodeBlock = ({ value, language, className = '' }: CodeBlockProps) => {
   };
 
   return (
-    <div className={cn("relative rounded-md", className)}>
-      {language &&
+    <div className={cn("relative rounded-md overflow-hidden", className)}>
+      <div className="absolute top-2 right-0 flex">
+        {language && (
+          <span className="text-slate-600 rounded-md text-xs px-2 mr-2 flex items-center">
+            {language}
+          </span>
+        )}
         <CopyToClipboard text={value} onCopy={handleCopy}>
           <Button
+            variant={'ghost'}
             onClick={handleCopy}
-            className="absolute top-0 right-0 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 focus:outline-none"
+            className={cn("px-2 flex items-center", copied ? "text-black" : "text-slate-400")}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? <ClipboardCheck size={14}/> : <Clipboard size={14}/>}
           </Button>
         </CopyToClipboard>
-      }
-      {language && <Button className='mb-2 font-semibold text-slate-600 bg-slate-300 hover:bg-slate-500'>{language}</Button>}
+      </div>
       <SyntaxHighlighter language={language}>
         {value}
       </SyntaxHighlighter>

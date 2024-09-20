@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PostCreate, postCreateSchema } from "@/schemas/PostSchema";
 import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import Combobox from "@/components/Combobox";
 import { Tag } from "@/schemas/TagSchema";
 import { createPostService } from "@/services/PostService";
@@ -196,12 +196,12 @@ export default function PublishPostPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input className="focus-visible:rounded-r focus-visible:ring-1 focus-visible:ring-offset-0" placeholder="Title" {...field} />
+                    <Input className="bg-white" placeholder="Title" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
-            {preview && (
+            {!preview && (
               <Button className="absolute rounded-l-none top-0 right-0 rounded-r bg-[#f5f7fa] hover:bg-slate-50 border">
                 <Link to={`/p/${preview}`}>
                   <ExternalLink className="text-blue-500" size={16} strokeWidth={1.25} />

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { formatDate } from "@/helpers/changeDate";
-import { ToolTip } from "../Tooltip";
 import MarkdownViewer from "../MarkdownViewer";
 import { ChevronDown, ChevronUp, Ellipsis, Flag, Pencil, Trash, WandSparkles } from "lucide-react";
 import {
@@ -21,7 +20,13 @@ import { useEffect, useState } from "react";
 import { Comment } from "@/models/Comment";
 import React from "react";
 import { CommentForm } from "./CommentForm";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Button } from "../ui/button";
 interface CommentProps {
   comment: Comment;
   isRootComment?: boolean;
@@ -74,11 +79,17 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
               <span className="text-[#9b9b9b] mr-1 text-sm">{`@${comment?.user?.username}`}</span>
             </Link>
             <div className="break-words leading-none">
-              <ToolTip id={`comment-${comment.id}`} content={formattedDate}>
-                <span className="text-[#9b9b9b] text-sm">
-                  {formatDate(formattedDate)}
-                </span>
-              </ToolTip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span className="text-[#9b9b9b] text-sm">
+                      {formatDate(formattedDate)}
+                    </span></TooltipTrigger>
+                  <TooltipContent>
+                    <p>{formattedDate}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
@@ -92,25 +103,57 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
 
       <footer className="flex items-center text-[#9b9b9b] text-sm">
         <div>
-          <ToolTip id={`population-1`} content="Bạn cần 50 điểm reputations để vote">
-            <ChevronUp size={14} className="text-slate-400" />
-          </ToolTip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <span className="text-[#9b9b9b] text-sm">
+                  <ChevronUp size={14} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Bạn cần 50 điểm reputations để vote</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <span className="mx-1">1</span>
-          <ToolTip id={`population-1`} content="Bạn cần 50 điểm reputations để vote">
-            <ChevronDown size={14} className="text-slate-400" />
-          </ToolTip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="mr-2">
+                <span className="text-[#9b9b9b] text-sm">
+                  <ChevronDown size={14} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Bạn cần 50 điểm reputations để vote</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <span className="mx-2">|</span>
+        <span>|</span>
         {auth && (
-          <ToolTip id={`replay-comment`} content="Trả lời">
-            <button onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline text-blue-300 mr-2">Trả lời</button>
-          </ToolTip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant={'link'} onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline text-blue-300">Trả lời</Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Trả lời</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
 
         <div className="relative mr-2">
-          <ToolTip id={`share-comment`} content="Chia sẻ đường dân của bình luận này">
-            <Link to={`/c/${comment.id}`}>Chia sẻ</Link>
-          </ToolTip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link to={`/c/${comment.id}`}>Chia sẻ</Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Chia sẻ đường dân của bình luận này</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         {auth && (
           <DropdownMenu>

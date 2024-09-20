@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Bookmark, ChevronDown, ChevronUp, Facebook, Twitter, Type } from "lucide-react";
+import { Bookmark, ChevronDown, ChevronUp, Facebook, Type } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { TwitterLogoIcon } from "@radix-ui/react-icons";
 
 type PostActionProps = {
   className?: string;
@@ -15,6 +22,7 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
     <div className={cn("flex flex-col sticky top-0 h-screen items-center justify-center mx-auto py-24", className)}>
       <div className="flex flex-col items-center space-y-1 text-4xl mb-4">
         <Button
+          variant={'ghost'}
           className={cn(
             'hover:bg-white bg-white',
             user_vote === 'up' ? 'text-blue-500' : 'text-gray-400' // Đổi màu nếu đã vote 'up'
@@ -30,6 +38,7 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
         </div>
 
         <Button
+          variant={'ghost'}
           className={cn(
             'hover:bg-white bg-white',
             user_vote === 'down' ? 'text-red-500' : 'text-gray-400' // Đổi màu nếu đã vote 'down'
@@ -42,12 +51,21 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
       </div>
 
       <div className="mb-8">
-        <Button
-          className={cn('text-gray-500 border-gray-500 p-2 hover:bg-slate-200 bg-white rounded-full hover:text-blue-400 hover:border-blue-400 border-[3px]')}
-          title="Bookmark this post"
-        >
-          <Bookmark size={18} strokeWidth={3} />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                className={cn('text-gray-500 border-gray-500 hover:bg-slate-200 p-2 bg-white rounded-full hover:text-blue-400 hover:border-blue-400 border-[2px]')}
+              >
+                <Bookmark size={18} strokeWidth={3} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Bookmark this post</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
       </div>
 
       <div className="mb-8">
@@ -56,23 +74,41 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
         </Button>
       </div>
 
-      <Button
-        className={cn('text-gray-400 border-gray-300 p-4 hover:bg-white leading-none bg-white rounded-full border mb-2 h-0 w-0')}
-        title="Share on Facebook"
-      >
-        <Link to="/">
-          <Facebook size={15} strokeWidth={1} />
-        </Link>
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              className={cn('text-gray-400 border-gray-300 p-3 hover:bg-white bg-white rounded-full mb-2')}
+            >
+              <Link to="/">
+                <Facebook size={15} strokeWidth={1} />
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Share on Facebook</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-      <Button
-        className={cn('text-gray-400 border-gray-300 p-4 hover:bg-white leading-none bg-white rounded-full border h-0 w-0')}
-        title="Share on Twitter"
-      >
-        <Link to="/">
-          <Twitter size={15} strokeWidth={1} />
-        </Link>
-      </Button>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              className={cn('text-gray-400 border-gray-300 p-3 hover:bg-white bg-white rounded-full')}
+            >
+              <Link to="/">
+                <TwitterLogoIcon strokeWidth={1} />
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Share on Twitter</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
     </div>
   );
 }

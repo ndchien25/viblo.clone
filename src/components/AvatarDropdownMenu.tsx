@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Building, FileText, History, LogOut, Settings, UserRound } from 'lucide-react';
 import { User } from "@/models/User";
 import { logout } from "@/services/AuthService";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAtom } from "jotai";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { useMutation } from "@tanstack/react-query";

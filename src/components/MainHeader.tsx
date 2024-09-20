@@ -63,16 +63,16 @@ export default function MainHeader() {
             <Input
               type="email"
               placeholder="Email"
-              className="w-full rounded-r-none focus-visible:rounded-r focus-visible:ring-1 focus-visible:ring-offset-0 leading-none"
+              className="w-full"
             />
-            <Button className="absolute rounded-l-none top-0 right-0 rounded-r">
+            <Button className="absolute rounded-l-none top-0 right-0">
               <Search color="#ffffff" />
             </Button>
           </div>
         </div>
         <div className="flex">
           <DropdownMenu>
-            <DropdownMenuTrigger className="focus:outline-none mr-3">
+            <DropdownMenuTrigger className="mr-3">
               <div className="relative py-2">
                 <div className="-top-1 absolute left-3">
                   <p className="flex h-1 w-1 items-center justify-center rounded-full bg-red-400 p-3 text-xs text-white">+99</p>

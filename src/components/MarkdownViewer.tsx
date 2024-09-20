@@ -34,6 +34,9 @@ export default function MarkdownViewer({ content, className }: MarkdownViewerPro
             <CodeBlock value={value} language={language} className={''} />
           );
         },
+        pre({ children }) {
+          return <>{children}</>;
+        },
         h1: (props) => <HeadingWithId level={1} {...props} />,
         h2: (props) => <HeadingWithId level={2} {...props} />,
         h3: (props) => <HeadingWithId level={3} {...props} />,

@@ -44,7 +44,7 @@ export function UserContainer({
             </Link>
             <span className="block text-sm text-gray-500">@{username}</span>
             <div className="mt-2">
-              <Button className={cn("bg-white text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white border-2 border-blue-500 px-1 py-2 text-sm")}>
+              <Button className={cn("bg-white text-blue-500 hover:bg-blue-500 hover:text-white border-blue-500")}>
                 <Plus className="inline mr-2" size={12}/>
                 Theo dõi
               </Button>
