@@ -8,18 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import {MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "@/components/table/DataTableColumnHeader"
-
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
-
-export const columns: ColumnDef<Payment>[] = [
+import { User } from "@/models/User"
+import { Switch } from "@/components/ui/switch"
+export const userColumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -41,11 +35,61 @@ export const columns: ColumnDef<Payment>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    size: 20,
+    enableResizing: false,
+    footer: props => props.column.id
   },
+  {
+    accessorKey: "username",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Username" />
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
+    filterFn: 'includesString'
+  },
+  {
+    accessorKey: "display_name",
+    header: "Display Name",
+  },
+  {
+    accessorKey: "role_id",
+    header: "Role",
+    cell: ({ row }) => {
+      const roleId = row.getValue("role_id")
+      const role = roleId === 1 ? "Admin" : roleId === 2 ? "Moderator" : "User"
+      return <div>{role}</div>
+    },
+    footer: props => props.column.id
+  },
+  {
+    accessorKey: "total_view",
+    header: () => <div>Total Views</div>,
+    cell: ({ row }) => {
+      const totalViews = parseFloat(row.getValue("total_view"))
+      return <div className="font-medium">{totalViews}</div>
+    },
+    footer: props => props.column.id
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: () => {
+      return (
+        <Switch className="" id="airplane-mode" />
+      )
+    },
+    size: 10,
+  },
+
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
+      const user = row.original
 
       return (
         <DropdownMenu>
@@ -58,7 +102,7 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(String(user.id))}
             >
               Copy payment ID
             </DropdownMenuItem>
@@ -69,28 +113,10 @@ export const columns: ColumnDef<Payment>[] = [
         </DropdownMenu>
       )
     },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
-    },
+    enableSorting: false,
+    enableHiding: false,
+    size: 20,
+    enableResizing: false,
+    footer: props => props.column.id
   },
 ]

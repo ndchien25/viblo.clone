@@ -5,93 +5,29 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
-import { DataTable } from "./data-table"
-import { columns, Payment } from "./colums"
+import { DataTable } from "./data-table";
+import { userColumns } from "@/pages/admin/users/colums";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getAllUserService, UserResponse } from "@/services/UserService";
+import { useState } from "react";
+import { PaginationState } from "@/models/Pagination";
+import { User } from "@/models/User";
 
-const payments: Payment[] = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    status: "processing",
-    email: "example@gmail.com",
-  },
-]
+export const UserPage = () => {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-export const User = () => {
+  const { data, error, isLoading } = useQuery<UserResponse, Error>({
+    queryKey: ['GetAllUser', pagination],
+    queryFn: () => getAllUserService(pagination.pageIndex + 1, pagination.pageSize),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
   return (
     <Card className="w-full mt-4">
       <CardHeader>
@@ -100,11 +36,33 @@ export const User = () => {
       </CardHeader>
       <CardContent>
         <div className="mx-auto">
-          <DataTable columns={columns} data={payments} />
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error: {error.message}</div>
+          ) : (
+            <DataTable<User, string>
+              userColumns={userColumns}
+              data={data?.data || []}
+              rowCount={data?.meta.total || 0}
+              last_page={data?.meta.last_page || 0}
+              pagination={pagination}
+              setPagination={(updater) => {
+                setPagination((prevState) => {
+                  const newPagination = typeof updater === 'function' ? updater(prevState) : updater;
+                  return {
+                    ...newPagination,
+                    pageIndex: newPagination.pageIndex, // Keep zero-based pagination here for the table
+                  };
+                });
+              }}
+            />
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
+        {/* You can add footer content here if needed */}
       </CardFooter>
     </Card>
-  )
-}
+  );
+};

@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Input } from "../ui/input"
+import React from "react"
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -22,11 +24,27 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const [pageInput, setPageInput] = React.useState(
+    table.getState().pagination.pageIndex + 1
+  )
+  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPageInput(Number(e.target.value)) // Update local input state
+  }
+
+  const handlePageBlur = () => {
+    const page = pageInput ? pageInput - 1 : 0
+    if (page >= 0 && page < table.getPageCount()) {
+      table.setPageIndex(page)
+    } else {
+      setPageInput(table.getState().pagination.pageIndex + 1)
+    }
+  }
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {table.getRowCount()} row(s) selected.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
@@ -49,11 +67,19 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </div>
         <div className="flex items-center space-x-2">
+          Page
+          <Input
+            min={1}
+            max={table.getPageCount()}
+            value={pageInput}
+            onChange={handlePageInputChange}
+            onBlur={handlePageBlur}
+            className="ml-2 h-8 w-12 p-0 text-center"
+          />
+          <span className="ml-2">
+            of {table.getPageCount()}
+          </span>
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"

@@ -56,12 +56,11 @@ export default function Combobox({ value, onChange }: ComboboxProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger className="w-full" asChild>
         <Button
           variant="outline"
           role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
+          className="justify-between flex focus-visible:ring-0"
         >
           <div className="flex gap-2 justify-start font-extralight">
             {value.length > 0
@@ -80,7 +79,7 @@ export default function Combobox({ value, onChange }: ComboboxProps) {
                   />
                 </div>
               ))
-              : "Gắn thẻ vào bài viết của bạn. Tối đa 5 thẻ. ít nhất 1 thẻ"}
+              : <span className="font-light">Gắn thẻ vào bài viết của bạn. Tối đa 5 thẻ. ít nhất 1 thẻ</span>}
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

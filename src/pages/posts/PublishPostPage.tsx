@@ -196,7 +196,7 @@ export default function PublishPostPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input className="bg-white" placeholder="Title" {...field} />
+                    <Input className="bg-white focus-visible:ring-0" placeholder="Title" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -209,7 +209,7 @@ export default function PublishPostPage() {
               </Button>
             )}
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-nowrap gap-3">
             <div className="flex flex-col flex-auto">
               <FormField
                 control={form.control}

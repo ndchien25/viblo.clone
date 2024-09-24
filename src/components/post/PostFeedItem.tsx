@@ -77,7 +77,6 @@ export const PostFeedItem: React.FC<PostFeedItemProps> = ({ post }) => {
           </div>
           <div className="flex justify-between flex-grow">
             <div className="flex">
-              asdasd
             </div>
             <div className="flex items-center">
               <ChevronsUpDown size={16} />

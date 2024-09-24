@@ -306,7 +306,7 @@ export default function MainHeader() {
           </DropdownMenu>
           {auth && <AvatarDropdownMenu user={user} />}
           {!auth &&
-            <Button className="bg-white hover:bg-white text-blue-400 hover:text-blue-300">
+            <Button variant={'ghost'} className="bg-white hover:bg-white text-blue-400 hover:text-blue-300">
               <Link to="/login" className="flex">
                 <LogIn size={20} />
                 <span className="ml-2">Đăng nhập/đăng ký</span>
