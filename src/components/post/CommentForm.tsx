@@ -14,14 +14,17 @@ import { useAtom } from "jotai";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCommentService } from "@/services/CommentService";
+import { createCommentService, updateCommentService } from "@/services/CommentService";
 
 interface CommentFormProps {
-  postId: number
+  postId?: number
   commentContent: string;
   setCommentContent: (content: string) => void;
-  parentId: number | null;
-  setShowReplyForm: (show:boolean) => void;
+  parentId?: number | null;
+  setShowReplyForm?: (show: boolean) => void;
+  setShowReplies?: (show: boolean) => void;
+  commentId?: number;
+  setIsEditing?: (show: boolean) => void;
 }
 
 interface CommentCreate {
@@ -30,7 +33,12 @@ interface CommentCreate {
   type: 'question' | 'post';
   parent_id: number | null;
 }
-export const CommentForm: React.FC<CommentFormProps> = ({setShowReplyForm ,parentId, postId, commentContent, setCommentContent }) => {
+
+interface CommentUpdate {
+  comment_id: number;
+  content: string;
+}
+export const CommentForm: React.FC<CommentFormProps> = ({ setShowReplyForm, parentId, postId, commentContent, setCommentContent, commentId, setIsEditing, setShowReplies }) => {
   const [user] = useAtom(userAtom);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -42,28 +50,54 @@ export const CommentForm: React.FC<CommentFormProps> = ({setShowReplyForm ,paren
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
   };
-
-  const { mutate } = useMutation({
+  const { mutate: createComment } = useMutation({
     mutationFn: async (data: CommentCreate) => createCommentService(data),
   });
 
+  const { mutate: updateComment } = useMutation({
+    mutationFn: async (data: CommentUpdate) => updateCommentService(data),
+  });
+
   const handleCommentSubmit = () => {
-    const payload: CommentCreate = {
-      post_id: postId,
-      content: commentContent,
-      type: 'post',
-      parent_id: parentId
-    };
-    mutate(payload, {
-      onSuccess: () => {
-        setCommentContent('')
-        if (!parentId) {
-          queryClient.invalidateQueries({ queryKey: ['GetComment', postId] })
-        } else {
-          queryClient.invalidateQueries({queryKey: ['GetCommentChild', parentId]})
-        }
-      },
-    });
+    if (commentId) {
+      // Update comment
+      const payload: CommentUpdate = {
+        comment_id: commentId,
+        content: commentContent,
+      };
+      updateComment(payload, {
+        onSuccess: () => {
+          setCommentContent('');
+          setIsEditing?.(false)
+          if (!parentId) {
+            queryClient.invalidateQueries({ queryKey: ['GetComment', postId] });
+          } else {
+            setShowReplies?.(true)
+            queryClient.invalidateQueries({ queryKey: ['GetCommentChild', parentId] });
+          }
+        },
+      });
+    } else {
+      // Create new comment
+      const payload: CommentCreate = {
+        post_id: postId!,
+        content: commentContent,
+        type: 'post',
+        parent_id: parentId || null,
+      };
+      createComment(payload, {
+        onSuccess: () => {
+          setCommentContent('');
+          setShowReplyForm?.(false)
+          if (!parentId) {
+            queryClient.invalidateQueries({ queryKey: ['GetComment', postId] });
+          } else {
+            setShowReplies?.(true)
+            queryClient.invalidateQueries({ queryKey: ['GetCommentChild', parentId] });
+          }
+        },
+      });
+    }
   };
   const handleEmojiSelect = (emoji: { native: string }) => {
     if (textareaRef.current) {
@@ -166,11 +200,22 @@ export const CommentForm: React.FC<CommentFormProps> = ({setShowReplyForm ,paren
           )
         )}
         <div className="flex justify-end">
-          {parentId &&
-            <Button onClick={() => setShowReplyForm(false)} className="hover:bg-slate-500 mr-2">
+          {parentId && setShowReplyForm && (
+            <Button
+              onClick={() => setShowReplyForm(false)}
+              className="hover:bg-slate-500 mr-2"
+            >
               Hủy
             </Button>
-          }
+          )}
+          {setIsEditing && (
+            <Button
+              onClick={() => setIsEditing(false)}
+              className="hover:bg-slate-500 mr-2"
+            >
+              Hủy
+            </Button>
+          )}
           <Button onClick={() => handleCommentSubmit()} className="hover:bg-slate-500">
             Bình luận
           </Button>

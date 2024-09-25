@@ -35,11 +35,13 @@ interface CommentProps {
 export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
   const [auth] = useAtom(authAtom)
   const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
-  const [currentUser] = useAtom(userAtom);
-  const isCurrentUser = currentUser?.id === comment.user_id;
+  const [user] = useAtom(userAtom);
+  const isCurrentUser = user?.id === comment.user_id;
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [commentContent, setCommentContent] = useState('');
+  const [commentContent, setCommentContent] = useState(comment.content);
+  const [isEditing, setIsEditing] = useState(false);
+
 
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetCommentChild', comment.id],
@@ -53,12 +55,29 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const handleUpdateComment = () => {
+    setIsEditing(false);
+  };
   useEffect(() => {
     if (showReplyForm) {
       setCommentContent(`@${comment.user.username}`)
     }
   }, [comment.user.username, showReplyForm])
 
+  const toggleReplyForm = () => {
+    if (isEditing) {
+      setIsEditing(false);  // Disable editing when showing replies
+    }
+    setShowReplyForm(!showReplyForm);
+  };
+
+  const toggleEditing = () => {
+    if (showReplyForm) {
+      setCommentContent(comment.content)
+      setShowReplyForm(false);  // Disable replies when editing
+    }
+    setIsEditing(!isEditing);
+  };
   return (
     <div className={cn("p-6 rounded", {
       'border-[#d6d6d7] border mb-4': isRootComment,
@@ -96,9 +115,19 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
       </header>
 
       <div className="mb-5">
-        <div className="overflow-hidden">
+        {isEditing ? (
+          <CommentForm
+            commentContent={commentContent}
+            setCommentContent={setCommentContent}
+            commentId={comment.id}
+            postId={comment.post_id}
+            setShowReplies={setShowReplies}
+            parentId={comment.parent_id}
+            setIsEditing={setIsEditing}
+          />
+        ) : (
           <MarkdownViewer content={comment.content} className="prose-stone prose-pre:bg-[#f1f2f3] prose-pre:border-[1px] prose-pre:text-black" />
-        </div>
+        )}
       </div>
 
       <footer className="flex items-center text-[#9b9b9b] text-sm">
@@ -134,7 +163,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Button variant={'link'} onClick={() => setShowReplyForm(!showReplyForm)} className="hover:underline text-blue-300">Trả lời</Button>
+                <Button variant={'link'} onClick={toggleReplyForm} className="hover:underline text-blue-300">Trả lời</Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Trả lời</p>
@@ -164,14 +193,29 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
               <DropdownMenuGroup>
                 {isCurrentUser ? (
                   <>
-                    <DropdownMenuItem>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      <span>Sửa</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Trash className="mr-2 h-4 w-4" />
-                      <span>Xóa bình luận này</span>
-                    </DropdownMenuItem>
+                    {isEditing ? (
+                      <>
+                        <DropdownMenuItem onClick={handleUpdateComment}>
+                          <WandSparkles className="mr-2 h-4 w-4" />
+                          <span>Lưu</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsEditing(false)}>
+                          <Trash className="mr-2 h-4 w-4" />
+                          <span>Hủy</span>
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenuItem onClick={toggleEditing}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          <span>Sửa</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Trash className="mr-2 h-4 w-4" />
+                          <span>Xóa bình luận này</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </>
                 ) : (
                   <DropdownMenuItem>
@@ -192,12 +236,12 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
       </footer>
 
       {showReplyForm &&
-        <CommentForm setShowReplyForm={setShowReplyForm} postId={comment.post_id} parentId={comment.id} commentContent={commentContent} setCommentContent={setCommentContent} />
+        <CommentForm setShowReplyForm={setShowReplyForm} postId={comment.post_id} parentId={comment.id} commentContent={commentContent} setCommentContent={setCommentContent} setShowReplies={setShowReplies}/>
       }
 
       {comment.row_count > 0 &&
         <div className="flex flex-col my-2 font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
-          <button onClick={() => setShowReplies(!showReplies)} className="flex items-center">
+          <button onClick={() => setShowReplies(true)} className="flex items-center">
             <ChevronDown size={14} className={showReplies ? 'rotate-180' : ''} />
             {!comment.parent_id ? (
               <span>Xem tất cả comment ({comment.row_count})</span>

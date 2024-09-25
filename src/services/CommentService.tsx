@@ -8,6 +8,10 @@ interface CommentCreate {
   parent_id: number | null;
 }
 
+interface CommentUpdate {
+  comment_id: number;
+  content: string;
+}
 export const createCommentService = async (data: CommentCreate): Promise<Comment> => {
   const response = await apiClient.post("/v1/comments", data);
   return response.data;
@@ -29,6 +33,12 @@ export const getCommentChildService = async (parentId: number, page: number): Pr
       page: page
     }
   });
+
+  return response.data
+}
+
+export const updateCommentService = async (data: CommentUpdate): Promise<Comment> => {
+  const response = await apiClient.put(`/v1/comments/${data.comment_id}`, {content: data.content})
 
   return response.data
 }
