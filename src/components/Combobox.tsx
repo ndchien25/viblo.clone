@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronDown, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,32 +15,21 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "./ui/input";
-import { searchTagService } from "@/services/TagService";
 import { Tag } from "@/schemas/TagSchema";
-import { useQuery } from "@tanstack/react-query"; // Import useQuery
+import { Badge } from "./ui/badge";
 
 interface ComboboxProps {
+  data: Tag[];
   value: Tag[];
   onChange: (tags: Tag[]) => void;
+  setParam: (param: string) => void;
+  isLoading: boolean
+  error: any
 }
 
-export default function Combobox({ value, onChange }: ComboboxProps) {
+export default function Combobox({ data, value, onChange, setParam, isLoading, error }: ComboboxProps) {
   const [open, setOpen] = useState(false);
-  const [param, setParam] = useState<string>("");
 
-  // React Query to fetch tags
-  const { data, isLoading, error } = useQuery<Tag[] | null, Error>({
-    queryKey: ['searchTag', param],
-    queryFn: () => searchTagService(param), // Wrap searchTagService in a function
-    enabled: param.length > 2,
-  });
-
-  // Log the error if it exists
-  if (error) {
-    console.error("Error fetching tags:", error.message);
-  }
-
-  // Function to update selected tags
   const handleSetValue = (tag: Tag) => {
     const updatedTags = value.some((selectedTag: Tag) => selectedTag.id === tag.id)
       ? value.filter((item: Tag) => item.id !== tag.id)
@@ -48,48 +37,60 @@ export default function Combobox({ value, onChange }: ComboboxProps) {
     onChange(updatedTags);
   };
 
-  // Function to remove selected tag
   const handleRemoveTag = (tagId: number) => {
     const updatedTags = value.filter((tag: Tag) => tag.id !== tagId);
     onChange(updatedTags);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="w-full" asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
+      <PopoverTrigger asChild>
         <Button
-          variant="outline"
           role="combobox"
-          className="justify-between flex focus-visible:ring-0"
+          className="flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit focus-visible:ring-0"
         >
-          <div className="flex gap-2 justify-start font-extralight">
-            {value.length > 0
-              ? value.map((tag: Tag) => (
-                <div
-                  key={tag.id}
-                  className="flex items-center px-2 py-1 rounded-xl border bg-slate-200 text-xs font-medium"
-                >
-                  {tag.name}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer hover:bg-slate-400 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveTag(tag.id);
-                    }}
-                  />
+          <div className="flex justify-between items-center w-full">
+            <div className="flex flex-wrap items-center w-full">
+              {value.length > 0 ? (
+                value.map((tag: Tag) => (
+                  <Badge
+                    key={tag.id}
+                    className={cn(
+                      "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                    )}
+                  >
+                    {tag.name}
+                    <XCircle
+                      className="ml-2 h-4 w-4 cursor-pointer rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveTag(tag.id);
+                      }}
+                    />
+                  </Badge>
+                ))
+              ) : (
+                <div className="flex items-center justify-between w-full mx-auto py-1 border rounded-md bg-slate-200 text-sm text-muted-foreground">
+                  <span className="mx-3">
+                    Gắn thẻ vào bài viết của bạn. Tối đa 5 thẻ. ít nhất 1 thẻ
+                  </span>
+                  <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
                 </div>
-              ))
-              : <span className="font-light">Gắn thẻ vào bài viết của bạn. Tối đa 5 thẻ. ít nhất 1 thẻ</span>}
+              )}
+            </div>
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent
+        className="w-[1000px] p-0"
+        align="start"
+        onEscapeKeyDown={() => setOpen(false)}
+      >
         <Command>
           <Input
             className="focus-visible:ring-0"
             placeholder="Search Tag..."
-            onChange={(e: any) => setParam(e.target.value)} // Update the search param
+            onChange={(e: any) => setParam(e.target.value)}
           />
           <CommandEmpty>No Tag found.</CommandEmpty>
           <CommandList>
@@ -118,6 +119,9 @@ export default function Combobox({ value, onChange }: ComboboxProps) {
                     {tag.name}
                   </CommandItem>
                 ))
+              )}
+              {error && (
+                <span>{error.message}</span>
               )}
             </CommandGroup>
           </CommandList>

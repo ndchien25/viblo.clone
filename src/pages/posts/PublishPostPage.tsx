@@ -4,12 +4,12 @@ import { ChevronDown, ExternalLink } from "lucide-react";
 import { SimpleMdeReact } from "react-simplemde-editor";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import "easymde/dist/easymde.min.css";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ import { createPostService } from "@/services/PostService";
 import { Editor } from "codemirror";
 import { getObjectService, uploadService } from "@/services/FileService";
 import { handleFileUpload } from "@/helpers/handleFileUpload";
+import { searchTagService } from "@/services/TagService";
 
 export default function PublishPostPage() {
   const { toast } = useToast();
@@ -111,11 +112,6 @@ export default function PublishPostPage() {
       localStorage.removeItem('post_title');
       localStorage.removeItem('post_tags');
       localStorage.removeItem('post_content');
-      form.reset({
-        title: "",
-        tags: [],
-        content: '',
-      });
     },
   });
 
@@ -183,8 +179,14 @@ export default function PublishPostPage() {
         await mutationUpload.mutateAsync(fileExtension)
       }
     }
-
   };
+
+  const [param, setParam] = useState<string>("");
+  const { data, isLoading, error } = useQuery<Tag[] | null, Error>({
+    queryKey: ['searchTag', param],
+    queryFn: () => searchTagService(param), // Wrap searchTagService in a function
+    enabled: param.length > 2,
+  });
   return (
     <div className="bg-[#f6f6f7] p-3">
       <Form {...form}>
@@ -201,7 +203,7 @@ export default function PublishPostPage() {
                 </FormItem>
               )}
             />
-            {!preview && (
+            {preview !== '' && (
               <Button className="absolute rounded-l-none top-0 right-0 rounded-r bg-[#f5f7fa] hover:bg-slate-50 border">
                 <Link to={`/p/${preview}`}>
                   <ExternalLink className="text-blue-500" size={16} strokeWidth={1.25} />
@@ -218,9 +220,15 @@ export default function PublishPostPage() {
                   <FormItem>
                     <FormControl>
                       <Combobox
+                        data={data || []}
                         value={field.value}
-                        onChange={(tags: Tag[]) => field.onChange(tags)} />
+                        onChange={(tags: Tag[]) => field.onChange(tags)}
+                        setParam={setParam}
+                        isLoading={isLoading}
+                        error={error}
+                      />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
