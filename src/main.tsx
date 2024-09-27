@@ -6,10 +6,12 @@ import {
 } from "react-router-dom";
 import router from './routes';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Toaster } from './components/ui/toaster';
 const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
     <ReactQueryDevtools initialIsOpen={false} />
+    <Toaster />
   </QueryClientProvider>
 )

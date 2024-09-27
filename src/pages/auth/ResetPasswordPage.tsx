@@ -20,15 +20,19 @@ import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/img/logo_viblo.svg";
 import { z } from "zod";
-import { resendVerificationEmailService } from "@/services/AuthService";
+import { resetPasswordService } from "@/services/AuthService";
 import { ResetPasswordSchema } from "@/schemas/AuthSchema";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
 export default function ResetPassword({ className, ...props }: CardProps) {
+  const query = new URLSearchParams(useLocation().search);
+  const navigate = useNavigate()
+  const email = query.get('email')
+  const token = query.get('token')
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     mode: "onTouched",
@@ -39,10 +43,22 @@ export default function ResetPassword({ className, ...props }: CardProps) {
   });
   const { toast } = useToast()
   const mutation = useMutation({
-    mutationFn: (data: z.infer<typeof ResetPasswordSchema>) => resendVerificationEmailService(data),
+    mutationFn: (data: z.infer<typeof ResetPasswordSchema>) => resetPasswordService({
+      ...data,
+      email: email ?? "",
+      token: token ?? ""
+    }),
+    onSuccess: () => {
+      toast({
+        title: "Đổi mật khẩu thành công",
+        variant: 'success'
+      })
+      navigate("/login")
+    },
     onError: () => {
       toast({
-        title: "Có lỗi khi gửi vui lòng gửi lại sau",
+        variant: 'destructive',
+        title: "Có lỗi khi gửi vui lòng gửi lại sau"
       })
     },
   });

@@ -17,7 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCommentService, updateCommentService } from "@/services/CommentService";
 
 interface CommentFormProps {
-  postId?: number
+  postId: number
   commentContent: string;
   setCommentContent: (content: string) => void;
   parentId?: number | null;
@@ -37,6 +37,7 @@ interface CommentCreate {
 interface CommentUpdate {
   comment_id: number;
   content: string;
+  post_id: number;
 }
 export const CommentForm: React.FC<CommentFormProps> = ({ setShowReplyForm, parentId, postId, commentContent, setCommentContent, commentId, setIsEditing, setShowReplies }) => {
   const [user] = useAtom(userAtom);
@@ -62,6 +63,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ setShowReplyForm, pare
     if (commentId) {
       // Update comment
       const payload: CommentUpdate = {
+        post_id: postId,
         comment_id: commentId,
         content: commentContent,
       };

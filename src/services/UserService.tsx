@@ -26,7 +26,7 @@ export interface UserResponse {
 }
 
 export const getAllUserService = async (page: number, pageSize: number): Promise<UserResponse> => {
-  const response = await apiClient.get(`/v1/admin/user`, {
+  const response = await apiClient.get(`/v1/admin/users`, {
     params: {
       page: page,
       limit: pageSize

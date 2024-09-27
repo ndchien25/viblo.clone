@@ -1,8 +1,7 @@
-import { ForgotSchema, LoginSchema, RegisterSchema } from "@/schemas/AuthSchema"
+import { ForgotSchema, LoginSchema, RegisterSchema, ResetPasswordSchema } from "@/schemas/AuthSchema"
 import { AxiosResponse } from 'axios';
 import { z } from "zod"
 import { apiClient } from "@/configs/axios"
-
 export const loginService = async (data: z.infer<typeof LoginSchema>): Promise<any> => {
   const response = await apiClient.post("/v1/login", data)
   return response.data;
@@ -20,6 +19,11 @@ export const resendVerificationEmailService = async (data: any): Promise<AxiosRe
 
 export const forgotPasswordService = async (data: z.infer<typeof ForgotSchema>): Promise<AxiosResponse<any>> => {
   const response = await apiClient.post("/v1/forgot-password", data)
+  return response
+}
+
+export const resetPasswordService = async (data: z.infer<typeof ResetPasswordSchema> & { email: string; token: string }): Promise<AxiosResponse<any>> => {
+  const response = await apiClient.post("/v1/reset-password", {...data})
   return response
 }
 

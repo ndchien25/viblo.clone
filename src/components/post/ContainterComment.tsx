@@ -45,7 +45,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
 
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetCommentChild', comment.id],
-    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentChildService(comment.id, pageParam),
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentChildService(comment.post_id,comment.id, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
