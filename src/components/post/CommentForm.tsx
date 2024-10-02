@@ -91,16 +91,14 @@ export const CommentForm: React.FC<CommentFormProps> = ({ setShowReplyForm, pare
         onSuccess: () => {
           setCommentContent('');
           setShowReplyForm?.(false)
-          if (!parentId) {
-            queryClient.invalidateQueries({ queryKey: ['GetComment', postId] });
-          } else {
+          if (parentId) {
             setShowReplies?.(true)
-            queryClient.invalidateQueries({ queryKey: ['GetCommentChild', parentId] });
           }
         },
       });
     }
   };
+
   const handleEmojiSelect = (emoji: { native: string }) => {
     if (textareaRef.current) {
       const start = textareaRef.current.selectionStart;

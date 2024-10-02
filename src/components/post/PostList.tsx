@@ -12,7 +12,7 @@ export const PostList: React.FC<PostListProps> = ({ posts }) => {
       {posts.length > 0 ? (
         <>
           {posts.map((post) => (
-            <PostFeedItem post={post} />
+            <PostFeedItem key={post.id} post={post} />
           ))}
         </>
       ) : (

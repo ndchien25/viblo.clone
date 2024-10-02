@@ -51,9 +51,9 @@ export const SidebarFeedItem: React.FC<SidebarFeedItemProps> = ({
         </div>
       </div>
       <div className="sidebar__feed-item__subtitle mt-2">
-        <a href={authorUrl} className="text-gray-500 hover:text-black">
+        <Link to={authorUrl} className="text-gray-500 hover:text-black">
           {authorName}
-        </a>
+        </Link>
       </div>
     </div>
   )

@@ -36,6 +36,31 @@ export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    const channel = window.Echo.channel(`post.comment.${postId}`);
+
+    const handleCommentCreated = (event: Comment) => {
+      if (!event.parent_id) {
+        setComments((prevComments) => [event, ...prevComments]);
+      } else {
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === event.parent_id
+              ? { ...comment, row_count: comment.row_count + 1 }
+              : comment
+          )
+        );
+      }
+    };
+  
+    channel.listen('.post.comment.created', handleCommentCreated);
+  
+    return (() => {
+      channel.stopListening('.post.comment.created', handleCommentCreated);
+      window.Echo.leave(`post.comment.${postId}`)
+    })
+  }, [postId]);
+
   if (isLoading && !isFetching) return <div>Loading...</div>;
 
   return (

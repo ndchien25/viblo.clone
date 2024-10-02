@@ -146,27 +146,27 @@ export default function Sidebar({ headers }: SidebarProps) {
 									<div className="flex justify-between">
 										<div className="flex justify-between">
 											<div className="flex flex-col w-4/5">
-												<a href="https://code.viblo.asia/challenges/k8mepxmeMyJ?utm_source=Viblo_Service&amp;utm_medium=HomePage_Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="block text-black hover:text-blue-500">
+												<Link to="https://code.viblo.asia/challenges/k8mepxmeMyJ?utm_source=Viblo_Service&amp;utm_medium=HomePage_Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="block text-black hover:text-blue-500">
 													SubArray Level Up!!!
-												</a>
+												</Link>
 												<p className="text-gray-500 text-sm">thg 11 30, 2023 9:19 CH</p>
 												<span>
 													<div role="tooltip" aria-hidden="true" className="absolute bg-white min-w-36 rounded p-3 z-50 break-all el-popper w-[200px] hidden">
 														<div className="flex flex-wrap">
-															<a href="https://code.viblo.asia/challenges?tag=Greedy Method&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="py-[1px] px-[10px] bg-slate-400">
+															<Link to="https://code.viblo.asia/challenges?tag=Greedy Method&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="py-[1px] px-[10px] bg-slate-400">
 																Greedy Method
-															</a>
-															<a href="https://code.viblo.asia/challenges?tag=Dynamic programming&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="suggestion-item-tags">
+															</Link>
+															<Link to="https://code.viblo.asia/challenges?tag=Dynamic programming&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="suggestion-item-tags">
 																Dynamic programming
-															</a>
+															</Link>
 														</div>
 													</div>
 													<span className="el-popover__reference-wrapper">
 														<div className="el-popover__reference" aria-describedby="el-popover-8062">
 															<div id="1607-challenges" className="truncate">
-																<a href="https://code.viblo.asia/challenges?tag=Greedy Method&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="suggestion-item-tags">
+																<Link to="https://code.viblo.asia/challenges?tag=Greedy Method&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="suggestion-item-tags">
 																	Greedy Method
-																</a>
+																</Link>
 																{/* <a href="https://code.viblo.asia/challenges?tag=Dynamic programming&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="suggestion-item-tags">
 																	Dynamic programming
 																</a> */}
@@ -190,9 +190,9 @@ export default function Sidebar({ headers }: SidebarProps) {
 													</span>
 												</div>
 											</div>
-											<a href="https://code.viblo.asia/challenges?rank=E&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage_Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="challenge-rank-E py-[2px] px-[10px] h-fit rounded-[10px] font-bold text-xl">
+											<Link to="https://code.viblo.asia/challenges?rank=E&amp;utm_source=Viblo_Service&amp;utm_medium=HomePage_Viblo&amp;utm_campaign=SuggestionServices" target="_blank" className="challenge-rank-E py-[2px] px-[10px] h-fit rounded-[10px] font-bold text-xl">
 												E
-											</a>
+											</Link>
 										</div>
 
 									</div>

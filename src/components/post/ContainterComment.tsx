@@ -45,7 +45,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
 
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetCommentChild', comment.id],
-    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentChildService(comment.post_id,comment.id, pageParam),
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getCommentChildService(comment.post_id, comment.id, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
@@ -236,19 +236,16 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
       </footer>
 
       {showReplyForm &&
-        <CommentForm setShowReplyForm={setShowReplyForm} postId={comment.post_id} parentId={comment.id} commentContent={commentContent} setCommentContent={setCommentContent} setShowReplies={setShowReplies}/>
+        <CommentForm setShowReplyForm={setShowReplyForm} postId={comment.post_id} parentId={comment.id} commentContent={commentContent} setCommentContent={setCommentContent} setShowReplies={setShowReplies} />
       }
 
       {comment.row_count > 0 &&
         <div className="flex flex-col my-2 font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
           <button onClick={() => setShowReplies(true)} className="flex items-center">
             <ChevronDown size={14} className={showReplies ? 'rotate-180' : ''} />
-            {!comment.parent_id ? (
-              <span>Xem tất cả comment ({comment.row_count})</span>
-            ) : (
+            {!comment.parent_id && (
               <span>Xem tất cả replies comment ({comment.row_count})</span>
-            )
-            }
+            )}
           </button>
         </div>
       }
