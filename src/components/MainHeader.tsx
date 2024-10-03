@@ -8,7 +8,7 @@ import {
 import logo from "@/assets/img/logo_viblo.svg";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Bell, CircleHelp, Grip, Info, List, LogIn, Pen, PenLine, Search } from "lucide-react";
+import { Bell, CircleHelp, Grip, Info, List, Loader2, LogIn, Pen, PenLine, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -30,9 +30,53 @@ import LanguageSwitcher from "@/components/LanguageSwitch";
 import AvatarDropdownMenu from "@/components/AvatarDropdownMenu";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { useAtom } from "jotai";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getNotificationService } from "@/services/NotificationService";
+import { useEffect, useState } from "react";
+import { Notification } from "@/models/Notification";
+import NotificationsList from "./notification/ListNoti";
+
 export default function MainHeader() {
   const [auth,] = useAtom(authAtom);
-  const [user,] = useAtom(userAtom)
+  const [user,] = useAtom(userAtom);
+  const [notifications, setNotifications] = useState<Notification[]>([])
+
+  const { data, isLoading, isError, error, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    queryKey: ['GetNotification'],
+    queryFn: ({ pageParam = 1 }: { pageParam: number }) => getNotificationService(pageParam, 3),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.current_page < lastPage.total_pages ? lastPage.current_page + 1 : undefined;
+    },
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000,
+    enabled: auth,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setNotifications(data.pages.flatMap(page => page.notifications));
+    }
+  }, [data]);
+  
+  const totalRows = data?.pages[0]?.total || 0;
+
+  useEffect(() => {
+    if (user) {
+      const channel = window.Echo.private(`App.Models.User.${user.id}`);
+
+      const handleNotification = (notification: Notification) => {
+        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+      };
+
+      channel.notification(handleNotification);
+      return (() => {
+        channel.stopListening('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', handleNotification);
+        window.Echo.leave(`App.Models.User.${user?.id}`)
+      })
+    }
+  }, [user]);
+
   return (
     <header className="sticky w-full top-0 z-50 bg-white shadow h-16 py-4 ">
       <div className="flex flex-row items-center justify-between mx-auto max-w-7xl gap-28 container">
@@ -163,7 +207,7 @@ export default function MainHeader() {
                 <DropdownMenuTrigger className="focus:outline-none mr-3">
                   <div className="relative py-2">
                     <div className="-top-1 absolute left-3">
-                      <p className="flex h-1 w-1 items-center justify-center rounded-full bg-red-400 p-3 text-xs text-white">+99</p>
+                      <p className="flex h-1 w-1 items-center justify-center rounded-full bg-red-400 p-3 text-xs text-white">{totalRows > 99 ? "+99" : totalRows}</p>
                     </div>
                     <Bell color="#494141"></Bell>
                   </div>
@@ -179,65 +223,41 @@ export default function MainHeader() {
 
                   <ScrollArea className="h-72">
                     <DropdownMenuGroup className="list-item">
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="px-6 py-2">
-                        <Link to="/">
-                          <span className="break-words">
-                            Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                          </span>
-                          <br />
-                          <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                        </Link>
-                      </DropdownMenuItem>
+                      {isLoading ? (
+                        <div className="px-6 py-2 text-center">
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        </div>
+                      ) : isError ? (
+                        <div className="px-6 py-2 text-center text-red-500">
+                          {error.message || "Failed to load notifications."}
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div className="px-6 py-2 text-center text-gray-500">
+                          No notifications found.
+                        </div>
+                      ) : (
+                        <NotificationsList notifications={notifications}/>
+                      )}
+
                     </DropdownMenuGroup>
 
                   </ScrollArea>
                   <DropdownMenuSeparator className="m-0 bg-slate-300" />
-                  <DropdownMenuLabel className="flex justify-center">
+                  <DropdownMenuLabel className="flex justify-between items-center">
+                    {!isLoading && hasNextPage && (
+                      <Button
+                        variant="link"
+                        onClick={() => fetchNextPage()}
+                        disabled={!hasNextPage || isFetchingNextPage}
+                        className="p-0 h-0"
+                      >
+                        {isFetchingNextPage ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          "Load More"
+                        )}
+                      </Button>
+                    )}
                     <Link to="/annoucements" className="hover:underline">See All</Link>
                   </DropdownMenuLabel>
                 </DropdownMenuContent>

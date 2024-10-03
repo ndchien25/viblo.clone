@@ -1,6 +1,7 @@
 export type Notification = {
-  id: number;
+  id: string;
   data: any;
+  type: string;
   created_at: Date;
   read_at?: Date
 };
