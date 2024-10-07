@@ -1,29 +1,17 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Check, Loader2 } from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/img/logo_viblo.svg";
-import { useState } from "react";
-import { z } from "zod";
 import { resendVerificationEmailService } from "@/services/AuthService";
-import { useMutation } from "@tanstack/react-query";
 
 const formSchema = z.object({
   email: z.string().min(1, {

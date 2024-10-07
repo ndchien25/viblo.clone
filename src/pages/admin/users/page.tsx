@@ -15,7 +15,7 @@ import { useState } from "react";
 import { PaginationState } from "@/models/Pagination";
 import { User } from "@/models/User";
 
-export const UserPage = () => {
+const UserPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -66,3 +66,5 @@ export const UserPage = () => {
     </Card>
   );
 };
+
+export default UserPage;

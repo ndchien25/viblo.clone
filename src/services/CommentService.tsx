@@ -39,7 +39,7 @@ export const getCommentChildService = async (postId: number, parentId: number, p
 }
 
 export const updateCommentService = async (data: CommentUpdate): Promise<Comment> => {
-  const response = await apiClient.put(`/v1/postsC/${data.post_id}/comments/${data.comment_id}`, { content: data.content })
+  const response = await apiClient.put(`/v1/posts/${data.post_id}/comments/${data.comment_id}`, { content: data.content })
 
   return response.data
 }

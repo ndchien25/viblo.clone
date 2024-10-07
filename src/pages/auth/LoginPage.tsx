@@ -1,55 +1,31 @@
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-
-import {
-  Check,
-  Loader2,
-} from "lucide-react"
-
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { cn } from "@/lib/utils"
-import logo from "@/assets/img/logo_viblo.svg";
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Check, Loader2 } from "lucide-react";
+import logo from "@/assets/img/logo_viblo.svg";
 import ButtonFB from "@/components/social/ButtonFB"
 import ButtonGG from "@/components/social/ButtonGG"
 import ButtonGithub from "@/components/social/ButtonGithub"
 
 import { LoginSchema } from "@/schemas/AuthSchema"
-import { z } from "zod"
-import { useNavigate } from "react-router-dom"
-import { useAtom } from "jotai"
 import { authAtom, userAtom } from '@/atoms/authAtoms';
-
-import {
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
 import { loginService } from "@/services/AuthService"
+import { cn } from "@/lib/utils"
 
 type CardProps = React.ComponentProps<typeof Card>
-
-// Ensure loginService returns a Promise that resolves to AxiosResponse
 type LoginData = z.infer<typeof LoginSchema>;
 
 export default function LoginPage({ className, ...props }: CardProps) {
-  const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null); // Thêm state để lưu thông báo lỗi
+  const [errorMessage, setErrorMessage] = useState<React.ReactNode>(null);
   const navigate = useNavigate()
   const [, setAuth] = useAtom(authAtom);
   const [, setUser] = useAtom(userAtom);
@@ -65,41 +41,33 @@ export default function LoginPage({ className, ...props }: CardProps) {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginData) => loginService(data), // First argument is the mutation function
+    mutationFn: (data: LoginData) => loginService(data),
     onError: (err: any) => {
-      if (err.response?.data?.verified === false) {
-        setErrorMessage(
-          <div className="w-full p-3 bg-red-100 rounded">
-            <span className="text-red-500">
-              {err.response?.data?.message} <Link className="text-blue-600 hover:underline" to="/send-activation">Gửi lại</Link>
-            </span>
-          </div>
-        );
-      } else {
-        setErrorMessage(
-          <div className="w-full p-3 bg-red-100 rounded">
-            <span className="text-red-500">{err.response?.data?.message}</span>
-          </div>
-        );
-      }
+      const message = err.response?.data?.message;
+      const isVerified = err.response?.data?.verified === false;
+      setErrorMessage(
+        <div className="w-full p-3 bg-red-100 rounded">
+          <span className="text-red-500">
+            {message}
+            {isVerified && (
+              <Link className="text-blue-600 hover:underline" to="/send-activation"> Gửi lại</Link>
+            )}
+          </span>
+        </div>
+      );
     },
     onSuccess: (data) => {
-      console.log(data)
       setAuth(true);
       if (data.user) {
         setUser(data.user)
       }
-      if (data.user.role_id === 1) {
-        navigate('/admin/dashboard')
-      } else {
-        queryClient.invalidateQueries({ queryKey: ['auth'] });
-        navigate('/newest');
-      }
+      navigate(data.user.role_id === 1 ? '/admin/dashboard/index' : '/newest');
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
     }
   });
 
   const onSubmit = (data: LoginData) => {
-    setErrorMessage(null); // Reset error message on submit
+    setErrorMessage(null);
     loginMutation.mutate(data);
   };
 

@@ -1,36 +1,26 @@
+import { z } from "zod";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Check, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
 import { cn } from "@/lib/utils";
 import logo from "@/assets/img/logo_viblo.svg";
-import { useState } from "react";
+
 import ButtonFB from "@/components/social/ButtonFB";
 import ButtonGG from "@/components/social/ButtonGG";
 import ButtonGithub from "@/components/social/ButtonGithub";
 import { RegisterSchema } from "@/schemas/AuthSchema";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import { registerService } from "@/services/AuthService";
 
 type CardProps = React.ComponentProps<typeof Card>;
@@ -56,21 +46,19 @@ export default function RegisterPage({ className, ...props }: CardProps) {
   const mutation = useMutation({
     mutationFn: (data: z.infer<typeof RegisterSchema>) => registerService(data),
     onError: (err: any) => {
-      // Handle errors
-      console.log(err);
       if (err.response?.data?.errors) {
         setErrorMessage(err.response.data.errors);
       }
     },
     onSuccess: () => {
-      setIsRegistered(true); // Update state to show success message
+      setIsRegistered(true);
     },
   });
 
   const [errorMessage, setErrorMessage] = useState<Record<string, string>>({});
 
   const onSubmit = async (data: z.infer<typeof RegisterSchema>) => {
-    setErrorMessage({}); // Clear previous errors
+    setErrorMessage({});
     mutation.mutate(data);
   };
 

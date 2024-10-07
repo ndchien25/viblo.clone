@@ -1,42 +1,26 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { z } from "zod";
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
-import {
-  Check,
-  Loader2,
-} from "lucide-react"
+import { Check, Loader2 } from "lucide-react"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { cn } from "@/lib/utils"
 import logo from "@/assets/img/logo_viblo.svg";
-import { useState } from "react";
 import { ForgotSchema } from "@/schemas/AuthSchema"
 import { forgotPasswordService } from "@/services/AuthService"
-import { Link } from "react-router-dom"
-import { useMutation } from '@tanstack/react-query';
 
 type CardProps = React.ComponentProps<typeof Card>
 
 export default function ForgotPasswordPage({ className, ...props }: CardProps) {
   const [alertMessage, setAlertMessage] = useState<React.ReactNode>("");
-  const form = useForm<z.infer<typeof ForgotSchema>>({
+  const form = useForm<z.infer<typeof ForgotSchema>>({  
     resolver: zodResolver(ForgotSchema),
     mode: "onTouched",
     defaultValues: {

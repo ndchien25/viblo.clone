@@ -10,22 +10,24 @@ import { useAtom } from "jotai";
 import { titleNewAtom } from "@/atoms/authAtoms";
 
 export default function NewestPage() {
-
   const queryParameters = new URLSearchParams(window.location.search)
   const pageParam = queryParameters.get("page")
   const navigate = useNavigate();
   const [page, setPage] = useState<number>(Number(pageParam) || 1);
   const [titleNew, setTitleNew] = useAtom(titleNewAtom)
-  const { isPending, isError, error, data, isFetching } = useQuery({
+
+  const { isLoading, isError, error, data } = useQuery({
     queryKey: ['GetNewestPost', page],
     queryFn: () => getPostNewest(page),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
   });
+
   useEffect(() => {
     setTitleNew("Bài viêt mới nhất")
   }, [setTitleNew])
+
   useEffect(() => {
     if (pageParam) {
       setPage(Number(pageParam));
@@ -48,16 +50,12 @@ export default function NewestPage() {
       <div className="max-w-7xl items-center justify-center m-auto min-h-screen">
         <div className="grid grid-cols-16 pt-4 pb-4 gap-4">
           <div className="col-start-1 col-end-13">
-            {isPending ? (
-              <div>Loading...</div>
-            ) : isError ? (
-              <div>Error: {error.message}</div>
-            ) : (
+            {isLoading && <div>Loading...</div>}
+            {isError && <div>Error: {error.message}</div>}
+            {data && (
               <>
-                <PostList
-                  posts={data?.data ?? []}
-                />
-                <div className="mb-3"></div>
+                <PostList posts={data.data ?? []} />
+                <div className="mb-3" />
                 <PaginationComponent
                   currentPage={currentPage}
                   lastPage={lastPage}
@@ -65,7 +63,6 @@ export default function NewestPage() {
                 />
               </>
             )}
-            {isFetching ? <span> Loading...</span> : null}
           </div>
           <div className="col-start-13 col-span-4">
             <Sidebar title={''} />

@@ -7,7 +7,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from './components/ui/toaster';
 import Pusher from 'pusher-js';
 import Echo from 'laravel-echo';
-import { StrictMode } from 'react';
 import { apiClient } from './configs/axios';
 
 // Khởi tạo QueryClient
@@ -42,11 +41,9 @@ window.Echo = new Echo({
 
 // Bọc ứng dụng trong StrictMode
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
-      <Toaster />
-    </QueryClientProvider>
-  </StrictMode>
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    <ReactQueryDevtools initialIsOpen={false} />
+    <Toaster />
+  </QueryClientProvider>
 );

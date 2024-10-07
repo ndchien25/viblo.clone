@@ -1,29 +1,18 @@
+import { useMutation } from "@tanstack/react-query";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Check, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/img/logo_viblo.svg";
-import { z } from "zod";
 import { resetPasswordService } from "@/services/AuthService";
 import { ResetPasswordSchema } from "@/schemas/AuthSchema";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 type CardProps = React.ComponentProps<typeof Card>;
@@ -33,6 +22,8 @@ export default function ResetPassword({ className, ...props }: CardProps) {
   const navigate = useNavigate()
   const email = query.get('email')
   const token = query.get('token')
+  const { toast } = useToast()
+
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     mode: "onTouched",
@@ -41,7 +32,7 @@ export default function ResetPassword({ className, ...props }: CardProps) {
       c_password: ""
     },
   });
-  const { toast } = useToast()
+  
   const mutation = useMutation({
     mutationFn: (data: z.infer<typeof ResetPasswordSchema>) => resetPasswordService({
       ...data,
