@@ -163,60 +163,17 @@ export default function MainHeader() {
 
               <ScrollArea className="h-72">
                 <DropdownMenuGroup className="list-item">
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="px-6 py-2">
-                    <Link to="/">
-                      <span className="break-words">
-                        Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
-                      </span>
-                      <br />
-                      <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
-                    </Link>
-                  </DropdownMenuItem>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <DropdownMenuItem key={index} className="px-6 py-2">
+                      <Link to="/">
+                        <span className="break-words">
+                          Chính thức công bố Thể lệ chi tiết Wrire &amp; Inspire Blogathon - Sự kiện tìm kiếm những Trendsetters trên Viblo
+                        </span>
+                        <br />
+                        <small className="font-extralight">Aug 21st, 8:00 p.m.</small>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuGroup>
 
               </ScrollArea>

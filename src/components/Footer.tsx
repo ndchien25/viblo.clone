@@ -10,159 +10,39 @@ export default function Footer() {
           <div className="w-full md:w-1/3 px-4">
             <p className="mb-6 uppercase font-bold">tài nguyên</p>
             <ul className="grid grid-cols-2 gap-3">
-              <li><Link to="/">Bài viết</Link></li>
-              <li><Link to="/">Tổ chức</Link></li>
-              <li><Link to="/">Câu hỏi</Link></li>
-              <li><Link to="/">Tags</Link></li>
-              <li><Link to="/">Videos</Link></li>
-              <li><Link to="/">Tác giả</Link></li>
-              <li><Link to="/">Thảo luận</Link></li>
-              <li><Link to="/">Đề xuất hệ thống</Link></li>
-              <li><Link to="/">Công cụ</Link></li>
-              <li><Link to="/">Machine Learning</Link></li>
-              <li><Link to="/">Trạng thái hệ thống</Link></li>
+              {["Bài viết", "Tổ chức", "Câu hỏi", "Tags", "Videos", "Tác giả", "Thảo luận", "Đề xuất hệ thống", "Công cụ", "Machine Learning", "Trạng thái hệ thống"].map(item => (
+                <li key={item}>
+                  <Link to="/">{item}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="w-full md:w-1/4 px-4">
             <p className="mb-6 uppercase font-bold">dịch vụ</p>
             <div className="flex flex-wrap">
               <ul className="grid gap-3">
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="/favicon.ico"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-code.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo Code
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-ctf.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo CTF
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-cv.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo CV
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-learn.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo Learning
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-partner.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo Partner
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-battle.png"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo Battle
-                  </Link>
-                </li>
-                <li className="flex items-center">
-                  <Link
-                    to="https://viblo.asia"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white hover:text-blue-500 transition"
-                  >
-                    <img
-                      src="https://viblo.asia/images/viblo-interview.ico"
-                      alt="Viblo"
-                      width="24"
-                      height="24"
-                      className="mr-2"
-                    />
-                    Viblo Interview
-                  </Link>
-                </li>
+                {[
+                  { name: "Viblo", imgSrc: "/favicon.ico", link: "https://viblo.asia" },
+                  { name: "Viblo Code", imgSrc: "https://viblo.asia/images/viblo-code.png", link: "https://viblo.asia" },
+                  { name: "Viblo CTF", imgSrc: "https://viblo.asia/images/viblo-ctf.png", link: "https://viblo.asia" },
+                  { name: "Viblo CV", imgSrc: "https://viblo.asia/images/viblo-cv.png", link: "https://viblo.asia" },
+                  { name: "Viblo Learning", imgSrc: "https://viblo.asia/images/viblo-learn.png", link: "https://viblo.asia" },
+                  { name: "Viblo Partner", imgSrc: "https://viblo.asia/images/viblo-partner.png", link: "https://viblo.asia" },
+                  { name: "Viblo Battle", imgSrc: "https://viblo.asia/images/viblo-battle.png", link: "https://viblo.asia" },
+                  { name: "Viblo Interview", imgSrc: "https://viblo.asia/images/viblo-interview.ico", link: "https://viblo.asia" }
+                ].map(service => (
+                  <li className="flex items-center" key={service.name}>
+                    <Link
+                      to={service.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-white hover:text-blue-500 transition"
+                    >
+                      <img src={service.imgSrc} alt={service.name} width="24" height="24" className="mr-2" />
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -211,26 +91,18 @@ export default function Footer() {
             </div>
             <p className="mb-6 uppercase font-bold">Liên kết</p>
             <ul className="flex gap-4">
-              <li className="inline-block">
-                <Link to="https://www.facebook.com/viblo.asia/" target="_blank" rel="noopener">
-                  <Facebook />
-                </Link>
-              </li>
-              <li className="inline-block">
-                <Link to="https://github.com/viblo-asia/" target="_blank" rel="noopener">
-                  <Github />
-                </Link>
-              </li>
-              <li className="inline-block">
-                <Link to="https://chrome.google.com/webstore/detail/viblos-news-feed/mliahmjgdpkkicelofhbhgiidgljijmj" target="_blank" rel="noopener">
-                  <Chrome />
-                </Link>
-              </li>
-              <li className="inline-block">
-                <Link to="https://atom.io/packages/viblo" target="_blank" rel="noopener">
-                  <Atom />
-                </Link>
-              </li>
+              {[
+                { icon: <Facebook />, link: "https://www.facebook.com/viblo.asia/" },
+                { icon: <Github />, link: "https://github.com/viblo-asia/" },
+                { icon: <Chrome />, link: "https://chrome.google.com/webstore/detail/viblos-news-feed/mliahmjgdpkkicelofhbhgiidgljijmj" },
+                { icon: <Atom />, link: "https://atom.io/packages/viblo" }
+              ].map(social => (
+                <li className="inline-block" key={social.link}>
+                  <Link to={social.link} target="_blank" rel="noopener">
+                    {social.icon}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -243,53 +115,19 @@ export default function Footer() {
           </div>
           <div className="w-full sm:w-8/12 lg:w-7/12 xl:w-6/12">
             <ul className="list-none flex flex-wrap justify-between">
-              <li className="mb-2">
-                <Link to="https://about.viblo.asia/" target="_blank" rel="noopener">
-                  Về chúng tôi
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="/feedback">
-                  Phản hồi
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="/helps">
-                  Giúp đỡ
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="/faq">
-                  FAQs
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="/rss-channels">
-                  RSS
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="/terms/vi_term">
-                  Điều khoản
-                </Link>
-              </li>
-              <li className="mb-2 mx-2">
-                <Link to="https://www.dmca.com/Protection/Status.aspx?ID=41818fcd-5a60-4504-867a-38fde606354e&amp;refurl=https://viblo.asia/followings"
-                  title="DMCA.com Protection Status"
-                  target="_blank"
-                  rel="noopener"
-                  className="dmca-badge"
-                >
-                  <img
-                    src="https://images.dmca.com/Badges/dmca-badge-w100-5x1-07.png?ID=41818fcd-5a60-4504-867a-38fde606354e"
-                    alt="DMCA.com Protection Status"
-                    width="100"
-                    height="20"
-                    className="w-24 h-5"
-                  />
-                </Link>
-                <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
-              </li>
+              {[
+                { text: "Về chúng tôi", link: "https://about.viblo.asia/" },
+                { text: "Phản hồi", link: "/feedback" },
+                { text: "Giúp đỡ", link: "/helps" },
+                { text: "FAQs", link: "/faq" },
+                { text: "RSS", link: "/rss-channels" },
+                { text: "Điều khoản", link: "/terms" },
+                { text: "Chính sách", link: "/privacy" }
+              ].map(item => (
+                <li className="mr-4 text-sm" key={item.text}>
+                  <Link to={item.link}>{item.text}</Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

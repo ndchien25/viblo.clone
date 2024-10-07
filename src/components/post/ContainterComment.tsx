@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
   DropdownMenuSeparator
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { useAtom } from "jotai";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 interface CommentProps {
   comment: Comment;
   isRootComment?: boolean;
@@ -34,14 +34,15 @@ interface CommentProps {
 
 export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
   const [auth] = useAtom(authAtom)
-  const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
   const [user] = useAtom(userAtom);
   const isCurrentUser = user?.id === comment.user_id;
+
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [commentContent, setCommentContent] = useState(comment.content);
   const [isEditing, setIsEditing] = useState(false);
 
+  const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
 
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetCommentChild', comment.id],
@@ -55,18 +56,9 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const handleUpdateComment = () => {
-    setIsEditing(false);
-  };
-  useEffect(() => {
-    if (showReplyForm) {
-      setCommentContent(`@${comment.user.username}`)
-    }
-  }, [comment.user.username, showReplyForm])
-
   const toggleReplyForm = () => {
     if (isEditing) {
-      setIsEditing(false);  // Disable editing when showing replies
+      setIsEditing(false);
     }
     setShowReplyForm(!showReplyForm);
   };
@@ -74,10 +66,47 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
   const toggleEditing = () => {
     if (showReplyForm) {
       setCommentContent(comment.content)
-      setShowReplyForm(false);  // Disable replies when editing
+      setShowReplyForm(false);
     }
     setIsEditing(!isEditing);
   };
+
+  const handleUpdateComment = () => {
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    if (showReplyForm) {
+      setCommentContent(`@${comment.user.username}`)
+    }
+  }, [comment.user.username, showReplyForm])
+
+  const VotingButtons = () => (
+    <div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <span className="text-[#9b9b9b] text-sm"><ChevronUp size={14} /></span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Bạn cần 50 điểm reputations để vote</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <span className="mx-1">1</span>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <span className="text-[#9b9b9b] text-sm"><ChevronDown size={14} /></span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Bạn cần 50 điểm reputations để vote</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+
   return (
     <div data-commentid={`${comment.post_id}-${comment.id}`} className={cn("p-6 rounded", {
       'border-[#d6d6d7] border mb-4': isRootComment,
@@ -131,33 +160,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
       </div>
 
       <footer className="flex items-center text-[#9b9b9b] text-sm">
-        <div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <span className="text-[#9b9b9b] text-sm">
-                  <ChevronUp size={14} />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Bạn cần 50 điểm reputations để vote</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <span className="mx-1">1</span>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger className="mr-2">
-                <span className="text-[#9b9b9b] text-sm">
-                  <ChevronDown size={14} />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Bạn cần 50 điểm reputations để vote</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        <VotingButtons />
         <span>|</span>
         {auth && (
           <TooltipProvider>
@@ -232,7 +235,6 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-
       </footer>
 
       {showReplyForm &&

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAtom } from "jotai";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { useMutation } from "@tanstack/react-query";
+import { PATHS } from "@/routes/paths";
 
 interface AvatarDropdownMenuProps {
   user: User | null
@@ -31,11 +32,10 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
         });
         setUser(null);
         setAuth(false);
-        navigate("/newest");
+        navigate(PATHS.POSTS.NEWEST);
       }
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       toast({
         variant: "destructive",
         title: "Đăng xuất thất bại",
@@ -46,14 +46,14 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
   const handleLogout = () => {
     logoutMutation.mutate();
   };
-
-  const handleProfile = () => {
-    console.log("Navigate to profile");
-  };
-
-  const handleSettings = () => {
-    console.log("Navigate to settings");
-  };
+  
+  const menuItems = [
+    { icon: <UserRound className="mr-2 h-4 w-4" />, label: "Profile", action: () => console.log("Navigate to profile") },
+    { icon: <FileText className="mr-2 h-4 w-4" />, label: "My content", action: () => console.log("Navigate to my content") },
+    { icon: <History className="mr-2 h-4 w-4" />, label: "History", action: () => console.log("Navigate to history") },
+    { icon: <Building className="mr-2 h-4 w-4" />, label: "Organization", action: () => console.log("Navigate to organization") },
+    { icon: <Settings className="mr-2 h-4 w-4" />, label: "Settings", action: () => console.log("Navigate to settings") },
+  ];
 
   return (
     <DropdownMenu>
@@ -76,26 +76,12 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
           </div>
         </div>
         <DropdownMenuSeparator className="m-0 bg-slate-300" />
-        <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <UserRound className="mr-2 h-4 w-4" />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <FileText className="mr-2 h-4 w-4" />
-          <span>My content</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <History className="mr-2 h-4 w-4" />
-          <span>History</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleProfile} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <Building className="mr-2 h-4 w-4" />
-          <span>Organization</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSettings} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
+        {menuItems.map((item, index) => (
+          <DropdownMenuItem key={index} onClick={item.action} className="cursor-pointer hover:bg-gray-100 rounded-lg p-2">
+            {item.icon}
+            <span>{item.label}</span>
+          </DropdownMenuItem>
+        ))}
         <DropdownMenuSeparator className="m-0 bg-slate-300" />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 hover:bg-red-100 rounded-lg p-2">
           <LogOut className="mr-2 h-4 w-4" />
