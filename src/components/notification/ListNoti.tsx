@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { DropdownMenuItem } from '../ui/dropdown-menu';
 import { Notification } from '@/models/Notification';
+import { cn } from '@/lib/utils';
 const truncate = (text: string, length: number) => {
   return text.length > length ? `${text.slice(0, length)}...` : text;
 };
@@ -44,7 +45,7 @@ interface NotificationsListProps {
 const NotificationsList = ({ notifications }: NotificationsListProps) => (
   <>
     {notifications.map((notification: Notification) => (
-      <DropdownMenuItem key={notification.id} className="px-6 py-2">
+      <DropdownMenuItem key={notification.id} className={cn("px-6 py-2 shadow-inner focus:bg-white focus:shadow-custom focus:z-20", notification.read_at ? "bg-[#f2f6fc] focus:bg-[#f2f6fc]": "")}>
         <Link to={`/posts/${notification.data.post_slug}`} className="block">
           <span>{renderNotificationContent(notification)}</span>
           <br />

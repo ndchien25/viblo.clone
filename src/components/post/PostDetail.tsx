@@ -49,7 +49,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
             </div>
             <div className="mr-1 leading-6">
               <div className="flex gap-3 mb-2">
-                <div className="flex items-center">
+                <div className="flex items-center flex-wrap">
                   <Link to={`/u/${post.user.username}`} className="font-bold text-[#5488c7] mr-1">{post.user.display_name}</Link>
                   <span className="text-[#9b9b9b] mr-1">{`@${post.user.username}`}</span>
                   <Button variant="outline" className="text-xs h-7">Theo dõi</Button>

@@ -14,13 +14,13 @@ import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from "react-router-dom";
-import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/hover-card"
 import LanguageSwitcher from "@/components/LanguageSwitch";
 import AvatarDropdownMenu from "@/components/AvatarDropdownMenu";
-import { authAtom, userAtom } from "@/atoms/authAtoms";
+import { authAtom, titleNewAtom, userAtom } from "@/atoms/authAtoms";
 import { useAtom } from "jotai";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getNotificationService } from "@/services/NotificationService";
@@ -39,8 +39,10 @@ import NotificationsList from "./notification/ListNoti";
 export default function MainHeader() {
   const [auth,] = useAtom(authAtom);
   const [user,] = useAtom(userAtom);
+  const [newNotificationsCount, setNewNotificationsCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([])
-
+  const [isWindowFocused, setIsWindowFocused] = useState(true);
+  const [titleNew, setTitleNew] = useAtom(titleNewAtom)
   const { data, isLoading, isError, error, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['GetNotification'],
     queryFn: ({ pageParam = 1 }: { pageParam: number }) => getNotificationService(pageParam, 3),
@@ -54,11 +56,31 @@ export default function MainHeader() {
   });
 
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsWindowFocused(!document.hidden);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isWindowFocused && newNotificationsCount > 0) {
+      if (!titleNew.includes(`(${newNotificationsCount})`)) {
+        setTitleNew(`${titleNew} (${newNotificationsCount})`);
+      }
+    }
+  }, [isWindowFocused, newNotificationsCount, setTitleNew, titleNew]);
+
+  useEffect(() => {
     if (data) {
       setNotifications(data.pages.flatMap(page => page.notifications));
     }
   }, [data]);
-  
+
   const totalRows = data?.pages[0]?.total || 0;
 
   useEffect(() => {
@@ -67,6 +89,9 @@ export default function MainHeader() {
 
       const handleNotification = (notification: Notification) => {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+        if (!isWindowFocused) { // Chỉ tăng số lượng khi không ở domain viblo.clone và không focus
+          setNewNotificationsCount((prevCount) => prevCount + 1);
+        }
       };
 
       channel.notification(handleNotification);
@@ -75,7 +100,7 @@ export default function MainHeader() {
         window.Echo.leave(`App.Models.User.${user?.id}`)
       })
     }
-  }, [user]);
+  }, [isWindowFocused, user]);
 
   return (
     <header className="sticky w-full top-0 z-50 bg-white shadow h-16 py-4 ">
@@ -236,7 +261,7 @@ export default function MainHeader() {
                           No notifications found.
                         </div>
                       ) : (
-                        <NotificationsList notifications={notifications}/>
+                        <NotificationsList notifications={notifications} />
                       )}
 
                     </DropdownMenuGroup>

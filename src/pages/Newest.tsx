@@ -5,13 +5,17 @@ import { getPostNewest } from "@/services/PostService";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import PaginationComponent from "@/components/PaginationComponent";
+import { Helmet } from "react-helmet";
+import { useAtom } from "jotai";
+import { titleNewAtom } from "@/atoms/authAtoms";
 
 export default function NewestPage() {
+
   const queryParameters = new URLSearchParams(window.location.search)
   const pageParam = queryParameters.get("page")
   const navigate = useNavigate();
   const [page, setPage] = useState<number>(Number(pageParam) || 1);
-
+  const [titleNew, setTitleNew] = useAtom(titleNewAtom)
   const { isPending, isError, error, data, isFetching } = useQuery({
     queryKey: ['GetNewestPost', page],
     queryFn: () => getPostNewest(page),
@@ -19,7 +23,9 @@ export default function NewestPage() {
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
   });
-
+  useEffect(() => {
+    setTitleNew("Bài viêt mới nhất")
+  }, [setTitleNew])
   useEffect(() => {
     if (pageParam) {
       setPage(Number(pageParam));
@@ -35,32 +41,38 @@ export default function NewestPage() {
   };
 
   return (
-    <div className="max-w-7xl items-center justify-center m-auto min-h-screen">
-      <div className="grid grid-cols-16 pt-4 pb-4 gap-4">
-        <div className="col-start-1 col-end-13">
-          {isPending ? (
-            <div>Loading...</div>
-          ) : isError ? (
-            <div>Error: {error.message}</div>
-          ) : (
-            <>
-              <PostList
-                posts={data?.data ?? []}
-              />
-              <div className="mb-3"></div>
-              <PaginationComponent
-                currentPage={currentPage}
-                lastPage={lastPage}
-                onPageChange={handlePageChange}
-              />
-            </>
-          )}
-          {isFetching ? <span> Loading...</span> : null}
-        </div>
-        <div className="col-start-13 col-span-4">
-          <Sidebar title={''} />
+    <>
+      <Helmet>
+        <title>{titleNew}</title>
+      </Helmet>
+      <div className="max-w-7xl items-center justify-center m-auto min-h-screen">
+        <div className="grid grid-cols-16 pt-4 pb-4 gap-4">
+          <div className="col-start-1 col-end-13">
+            {isPending ? (
+              <div>Loading...</div>
+            ) : isError ? (
+              <div>Error: {error.message}</div>
+            ) : (
+              <>
+                <PostList
+                  posts={data?.data ?? []}
+                />
+                <div className="mb-3"></div>
+                <PaginationComponent
+                  currentPage={currentPage}
+                  lastPage={lastPage}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
+            {isFetching ? <span> Loading...</span> : null}
+          </div>
+          <div className="col-start-13 col-span-4">
+            <Sidebar title={''} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
+
   );
 }

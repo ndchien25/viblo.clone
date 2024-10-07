@@ -4,3 +4,5 @@ import { atom } from 'jotai';
 export const authAtom = atom<boolean>(false); 
 
 export const userAtom = atom<User | null>(null);
+
+export const titleNewAtom = atom<string>('');

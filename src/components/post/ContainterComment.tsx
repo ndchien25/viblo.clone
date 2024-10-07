@@ -79,7 +79,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
     setIsEditing(!isEditing);
   };
   return (
-    <div className={cn("p-6 rounded", {
+    <div data-commentid={`${comment.post_id}-${comment.id}`} className={cn("p-6 rounded", {
       'border-[#d6d6d7] border mb-4': isRootComment,
       'border-t border-gray-200': !isRootComment
     })}>

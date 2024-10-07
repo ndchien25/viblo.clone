@@ -6,12 +6,12 @@ import PostDetail from '@/components/post/PostDetail';
 import PostAction from '@/components/post/PostAction';
 import Sidebar from '@/components/Sidebar';
 import { PostComment } from '@/components/post/PostComment';
-import { authAtom } from '@/atoms/authAtoms';
+import { authAtom, titleNewAtom } from '@/atoms/authAtoms';
 import extractHeaders from '@/utils/extractHeader';
 import Header from '@/models/Header';
 import { Post } from '@/models/Post';
 import { getPostBySlugService, votePostService } from '@/services/PostService';
-
+import {Helmet} from "react-helmet";
 interface PostData {
   post: Post | null;
   user_vote: 'up' | 'down' | null;
@@ -24,16 +24,19 @@ export default function PostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [headers, setHeaders] = useState<Header[]>([]);
+  const [titleNew, setTitleNew] = useAtom(titleNewAtom)
 
-  const { data, isLoading, error, isSuccess } = useQuery<PostData | null, Error>({
+  const { data, isLoading, error } = useQuery<PostData | null, Error>({
     queryKey: ['PostBySlug'],
     queryFn: () => getPostBySlugService(slug as string),
     refetchOnWindowFocus: false,
   });
-
   useEffect(() => {
-    extractHeaders(data?.post?.content || '').then(setHeaders);
-  }, [data, isSuccess])
+    if (data?.post) {
+      setTitleNew(data.post.title || '')
+      extractHeaders(data.post.content || '').then(setHeaders);
+    }
+  }, [data, setTitleNew])
 
   const mutation = useMutation({
     mutationFn: async (vote: 'up' | 'down' | null) => { if (data?.post?.id) return votePostService(data?.post?.id, vote || 'none') },
@@ -46,15 +49,15 @@ export default function PostDetailPage() {
     if (!auth) {
       return navigate('/login');
     }
-  
+
     const newVote = vote === data?.user_vote ? null : vote;
-  
+
     const previousVote = data?.user_vote;  // Store previous vote to roll back if necessary
     const previousVoteCount = data?.post?.vote || 0;
-  
+
     if (data && data.post) {
       data.user_vote = newVote;
-  
+
       if (newVote === 'up') {
         data.post.vote = previousVote === 'down' ? previousVoteCount + 2 : previousVoteCount + 1;
       } else if (newVote === 'down') {
@@ -69,6 +72,9 @@ export default function PostDetailPage() {
 
   return (
     <>
+      <Helmet>
+        <title>{titleNew}</title>
+      </Helmet>
       {data?.post ? (
         <div className="max-w-7xl items-center justify-center m-auto px-7 min-h-screen">
           <div className="grid grid-cols-16 pt-4 pb-4 gap-4">
@@ -91,7 +97,7 @@ export default function PostDetailPage() {
               <Sidebar headers={headers} title={data.post.title || ''} />
             </div>
           </div>
-          <PostComment postId={data.post.id}/>
+          <PostComment postId={data.post.id} />
         </div>
       ) : (
         <div className="text-center text-red-500">Post not found</div>
