@@ -31,8 +31,7 @@ const router = createBrowserRouter(
       <Route path={PATHS.AUTH.FORGOT_PASSWORD} element={<SuspenseWrapper><ForgotPasswordPage /></SuspenseWrapper>} />
       <Route path={PATHS.AUTH.VERIFY_EMAIL} element={<SuspenseWrapper><VerifyEmail /></SuspenseWrapper>} />
       <Route path={PATHS.AUTH.RESET_PASSWORD} element={<SuspenseWrapper><ResetPassword /></SuspenseWrapper>} />
-
-      <Route element={<PublicRoute><RootLayout /></PublicRoute>}>
+      <Route path="/" element={<SuspenseWrapper><PublicRoute><RootLayout /></PublicRoute></SuspenseWrapper>}>
         <Route element={<MinimalLayout />}>
           <Route path={PATHS.POSTS.DETAIL} element={<SuspenseWrapper><PostDetailPage /></SuspenseWrapper>} />
         </Route>
@@ -42,7 +41,7 @@ const router = createBrowserRouter(
         </Route>
       </Route >
 
-      <Route path="/" element={<PrivateRoute><RootLayout /></PrivateRoute>}>
+      <Route element={<SuspenseWrapper><PrivateRoute><RootLayout /></PrivateRoute></SuspenseWrapper>}>
         <Route path={PATHS.POSTS.PUBLISH} element={<SuspenseWrapper><PublishPostPage /></SuspenseWrapper>} />
       </Route>
       <Route path={PATHS.ADMIN.BASE} element={<AdminRoute><AdminLayout /></AdminRoute>}>
