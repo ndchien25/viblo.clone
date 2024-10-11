@@ -46,15 +46,21 @@ export const PostComment: React.FC<PostCommentProps> = ({ postId }) => {
         setComments((prevComments) =>
           prevComments.map((comment) =>
             comment.id === event.parent_id
-              ? { ...comment, row_count: comment.row_count + 1 }
+              ? {
+                ...comment,
+                row_count: comment.row_count + 1,
+                replies: comment.replies
+                  ? [event, ...comment.replies]
+                  : [event],
+              }
               : comment
           )
         );
       }
     };
-  
+
     channel.listen('.post.comment.created', handleCommentCreated);
-  
+
     return (() => {
       channel.stopListening('.post.comment.created', handleCommentCreated);
       window.Echo.leave(`post.comment.${postId}`)

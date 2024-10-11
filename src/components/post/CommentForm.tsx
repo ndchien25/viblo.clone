@@ -62,10 +62,6 @@ export const CommentForm: React.FC<CommentFormProps> = React.memo(({ setShowRepl
       if (parentId) {
         setShowReplies?.(true);
       }
-      queryClient.invalidateQueries({ queryKey: ['GetComment', postId] });
-      if (parentId) {
-        queryClient.invalidateQueries({ queryKey: ['GetCommentChild', parentId] });
-      }
     },
   });
 

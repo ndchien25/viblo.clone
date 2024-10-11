@@ -14,11 +14,10 @@ import {
 import { useAtom } from "jotai";
 import { authAtom, userAtom } from "@/atoms/authAtoms";
 import { cn } from "@/lib/utils";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getCommentChildService } from "@/services/CommentService";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCommentService, getCommentChildService } from "@/services/CommentService";
 import { useEffect, useState } from "react";
 import { Comment } from "@/models/Comment";
-import React from "react";
 import { CommentForm } from "./CommentForm";
 import {
   Tooltip,
@@ -36,11 +35,12 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
   const [auth] = useAtom(authAtom)
   const [user] = useAtom(userAtom);
   const isCurrentUser = user?.id === comment.user_id;
-
+  const [replies, setReplies] = useState<Comment[]>(comment.replies ?? []);
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [commentContent, setCommentContent] = useState(comment.content);
   const [isEditing, setIsEditing] = useState(false);
+  const queryClient = useQueryClient();
 
   const formattedDate = comment.updated_at ? formatDate(comment.updated_at.toString()) : "N/A";
 
@@ -56,6 +56,12 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
+  useEffect(() => {
+    if (data) {
+      const allReplies = data.pages.flatMap((page) => page.comments);
+      setReplies(allReplies);
+    }
+  }, [data]);
   const toggleReplyForm = () => {
     if (isEditing) {
       setIsEditing(false);
@@ -81,6 +87,22 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
     }
   }, [comment.user.username, showReplyForm])
 
+  const { mutate: deleteComment } = useMutation({
+    mutationFn: async () => deleteCommentService(comment.post_id, comment.id),
+    onSuccess: () => {
+      if (!comment.parent_id) {
+        queryClient.invalidateQueries({ queryKey: ['GetComment', comment.post_id] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['GetCommentChild', comment.parent_id] });
+      }
+    },
+  });
+
+  const handleDeleteComment = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bình luận này?')) { // "Are you sure you want to delete this comment?"
+      deleteComment()
+    }
+  };
   const VotingButtons = () => (
     <div>
       <TooltipProvider>
@@ -213,7 +235,7 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
                           <Pencil className="mr-2 h-4 w-4" />
                           <span>Sửa</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDeleteComment}>
                           <Trash className="mr-2 h-4 w-4" />
                           <span>Xóa bình luận này</span>
                         </DropdownMenuItem>
@@ -258,16 +280,12 @@ export const ContainerComment = ({ comment, isRootComment }: CommentProps) => {
             <p>Loading...</p>
           ) : (
             <>
-              {data?.pages.map((page, i) => (
-                <React.Fragment key={i}>
-                  {page.comments.map((reply) => (
-                    <ContainerComment
-                      key={reply.id}
-                      comment={reply}
-                      isRootComment={false}
-                    />
-                  ))}
-                </React.Fragment>
+              {replies.map((reply) => (
+                <ContainerComment
+                  key={reply.id}
+                  comment={reply}
+                  isRootComment={false}
+                />
               ))}
               {hasNextPage && !isFetchingNextPage && (
                 <button

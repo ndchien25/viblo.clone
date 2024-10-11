@@ -89,7 +89,7 @@ export default function MainHeader() {
 
       const handleNotification = (notification: Notification) => {
         setNotifications((prevNotifications) => [notification, ...prevNotifications]);
-        if (!isWindowFocused) { // Chỉ tăng số lượng khi không ở domain viblo.clone và không focus
+        if (!isWindowFocused) {
           setNewNotificationsCount((prevCount) => prevCount + 1);
         }
       };

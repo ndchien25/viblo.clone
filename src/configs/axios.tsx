@@ -2,7 +2,7 @@ import { hasCsrfCookie } from "@/helpers/checkCookie";
 import axios from "axios"
 
 const apiClient = axios.create({
-    baseURL: 'https://api.viblo.clone/api',
+    baseURL: 'https://api.viblo-clone.com/api',
     withCredentials: true,
     withXSRFToken: true,
     timeout: 60000,
@@ -15,7 +15,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(async (config) => {
     if (!hasCsrfCookie()) {
-        await axios.get('https://api.viblo.clone/sanctum/csrf-cookie', { withCredentials: true });
+        await axios.get('https://api.viblo-clone.com/sanctum/csrf-cookie', { withCredentials: true });
     }
     return config;
 }, (error) => {

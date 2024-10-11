@@ -11,6 +11,7 @@ export type Comment = {
   created_at?: Date;
   updated_at?: Date;
   user: User;
+  replies?: Comment[];
 };
 
 export type CommentPaginationResponse = {

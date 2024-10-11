@@ -43,3 +43,9 @@ export const updateCommentService = async (data: CommentUpdate): Promise<Comment
 
   return response.data
 }
+
+export const deleteCommentService = async (post_id: number, comment_id: number): Promise<Comment> => {
+  const response = await apiClient.delete(`/v1/posts/${post_id}/comments/${comment_id}`)
+
+  return response.data
+}
