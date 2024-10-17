@@ -53,12 +53,8 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
       <div className="mb-8">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
-              <Button
-                className={cn('text-gray-500 border-gray-500 hover:bg-slate-200 p-2 bg-white rounded-full hover:text-blue-400 hover:border-blue-400 border-[2px]')}
-              >
-                <Bookmark size={18} strokeWidth={3} />
-              </Button>
+            <TooltipTrigger className={cn('text-gray-500 border-gray-500 hover:bg-slate-200 p-2 bg-white rounded-full hover:text-blue-400 hover:border-blue-400 border-[2px]')}>
+              <Bookmark size={18} strokeWidth={3} />
             </TooltipTrigger>
             <TooltipContent>
               <p>Bookmark this post</p>
@@ -76,7 +72,7 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
 
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               className={cn('text-gray-400 border-gray-300 p-3 hover:bg-white bg-white rounded-full mb-2')}
             >
@@ -94,7 +90,7 @@ export default function PostAction({ className, vote, user_vote, onVote }: PostA
 
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               className={cn('text-gray-400 border-gray-300 p-3 hover:bg-white bg-white rounded-full')}
             >

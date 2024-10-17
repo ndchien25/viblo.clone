@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "../ui/input"
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -24,22 +24,26 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const [pageInput, setPageInput] = React.useState(
+  const [inputPage, setInputPage] = useState<number>(
     table.getState().pagination.pageIndex + 1
   )
-  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPageInput(Number(e.target.value)) // Update local input state
-  }
+  useEffect(() => {
+    setInputPage(table.getState().pagination.pageIndex + 1)
+  }, [table.getState().pagination.pageIndex])
 
-  const handlePageBlur = () => {
-    const page = pageInput ? pageInput - 1 : 0
-    if (page >= 0 && page < table.getPageCount()) {
-      table.setPageIndex(page)
+  const handlePageChange = () => {
+    if (inputPage > 0 && inputPage <= table.getPageCount()) {
+      table.setPageIndex(inputPage - 1) // Set pageIndex phải bắt đầu từ 0
     } else {
-      setPageInput(table.getState().pagination.pageIndex + 1)
+      setInputPage(table.getState().pagination.pageIndex + 1)
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handlePageChange()
+    }
+  }
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -72,10 +76,12 @@ export function DataTablePagination<TData>({
           <Input
             min={1}
             max={table.getPageCount()}
-            value={pageInput}
-            onChange={handlePageInputChange}
-            onBlur={handlePageBlur}
+            value={inputPage}
+            onChange={(e) => setInputPage(Number(e.target.value))}
+            onBlur={handlePageChange}
+            onKeyDown={handleKeyDown}
             className="ml-2 h-8 w-12 p-0 text-center"
+            type="number"
           />
           <span className="ml-2">
             of {table.getPageCount()}

@@ -112,7 +112,7 @@ export default function MainHeader() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
                   <Link to="/newest">
                     Bài viết
                   </Link>
@@ -247,7 +247,7 @@ export default function MainHeader() {
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none mr-3">
                   <HoverCard>
-                    <HoverCardTrigger asChild>
+                    <HoverCardTrigger>
                       <Button variant="link" className="p-0"><PenLine /></Button>
                     </HoverCardTrigger>
                     <HoverCardContent className="w-auto">

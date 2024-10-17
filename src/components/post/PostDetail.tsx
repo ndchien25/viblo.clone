@@ -129,7 +129,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, loading, error, comment_c
         <div className="mr-4">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button variant={'ghost'} className="text-gray-400 border-gray-300 hover:bg-white">
                   <Link to="/">
                     <Facebook size={20} strokeWidth={1.5} />
