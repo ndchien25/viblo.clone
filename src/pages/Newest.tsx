@@ -5,7 +5,7 @@ import { getPostNewest } from "@/services/PostService";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import PaginationComponent from "@/components/PaginationComponent";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { useAtom } from "jotai";
 import { titleNewAtom } from "@/atoms/authAtoms";
 
