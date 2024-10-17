@@ -94,6 +94,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
                           {...field}
                           type="text"
                           placeholder="Tên người dùng hoặc email"
+                          autoComplete="on"
                         />
                       </FormControl>
                       <FormMessage className="text-red-500 text-xs" />
@@ -107,7 +108,7 @@ export default function LoginPage({ className, ...props }: CardProps) {
                     <FormItem>
                       <FormLabel className={cn("text-slate-700", className)}>Mật khẩu</FormLabel>
                       <FormControl>
-                        <Input {...field} type="password" placeholder="Mật khẩu" />
+                        <Input {...field} type="password" placeholder="Mật khẩu" autoComplete="password" />
                       </FormControl>
                       <FormMessage className="text-red-500 text-xs" />
                     </FormItem>

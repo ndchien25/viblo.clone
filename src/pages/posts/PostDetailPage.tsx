@@ -11,7 +11,7 @@ import extractHeaders from '@/utils/extractHeader';
 import Header from '@/models/Header';
 import { Post } from '@/models/Post';
 import { getPostBySlugService, votePostService } from '@/services/PostService';
-import {Helmet} from "react-helmet";
+import {Helmet} from "react-helmet-async";
 interface PostData {
   post: Post | null;
   user_vote: 'up' | 'down' | null;
