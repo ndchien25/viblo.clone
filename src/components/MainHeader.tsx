@@ -21,11 +21,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from "react-router-dom";
+
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import LanguageSwitcher from "@/components/LanguageSwitch";
 import AvatarDropdownMenu from "@/components/AvatarDropdownMenu";
 import { authAtom, titleNewAtom, userAtom } from "@/atoms/authAtoms";
@@ -246,16 +248,16 @@ export default function MainHeader() {
               </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none mr-3">
-                  <HoverCard>
-                    <HoverCardTrigger>
-                      <Button variant="link" className="p-0"><PenLine /></Button>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-auto">
-                      <p className="text-sm">
-                        write
-                      </p>
-                    </HoverCardContent>
-                  </HoverCard>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <PenLine />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>write</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <Separator />
@@ -287,7 +289,7 @@ export default function MainHeader() {
           }
           <LanguageSwitcher />
           <DropdownMenu>
-            <DropdownMenuTrigger className="focus:outline-none mr-7">
+            <DropdownMenuTrigger className="focus:outline-none mr-7" asChild>
               <div className="relative py-1">
                 <div className="-top-1 absolute left-2">
                   <p className="flex h-1 items-center justify-center rounded-full bg-red-400 p-2 text-xs text-white">new</p>

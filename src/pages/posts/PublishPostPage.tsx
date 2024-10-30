@@ -28,7 +28,7 @@ import { Editor } from "codemirror";
 import { getObjectService, uploadService } from "@/services/FileService";
 import { handleFileUpload } from "@/helpers/handleFileUpload";
 import { searchTagService } from "@/services/TagService";
-
+import { debounce } from 'lodash';
 export default function PublishPostPage() {
   const { toast } = useToast();
   const delay = 1000; // Delay for autosave in milliseconds
@@ -182,10 +182,22 @@ export default function PublishPostPage() {
   };
 
   const [param, setParam] = useState<string>("");
+  const [debouncedParam, setDebouncedParam] = useState<string>(param);
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedParam(param);
+    }, 300); // Delay of 300ms
+
+    handler();
+
+    return () => {
+      handler.cancel();
+    };
+  }, [param]);
   const { data, isLoading, error } = useQuery<Tag[] | null, Error>({
-    queryKey: ['searchTag', param],
-    queryFn: () => searchTagService(param), // Wrap searchTagService in a function
-    enabled: param.length > 2,
+    queryKey: ['searchTag', debouncedParam],
+    queryFn: () => searchTagService(debouncedParam), // Wrap searchTagService in a function
+    enabled: debouncedParam.length > 2,
   });
   return (
     <div className="bg-[#f6f6f7] p-3">
@@ -248,7 +260,7 @@ export default function PublishPostPage() {
                 Lưu lại
               </Button>
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button
                     className={cn(
                       "bg-white text-black hover:text-blue-500 hover:bg-slate-100")}>

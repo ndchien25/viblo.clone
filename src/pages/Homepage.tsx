@@ -1,4 +1,4 @@
-export function Homepage() {
+export default function Homepage() {
   
   return (
     <>
